@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+
+    <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Bienvenido</h1>
+            <p class="text-gray-600 mt-2">Ingresa a tu cuenta o crea una nueva</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-4">
+            <div class="grid grid-cols-2 border rounded overflow-hidden text-center font-semibold">
+                <button id="tab-login" class="py-2 bg-gray-100 text-gray-800 border-r border-gray-300">Ingresar</button>
+                <button id="tab-signup" class="py-2 text-gray-600 hover:bg-gray-50">Crear Cuenta</button>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="form-login" class="space-y-4">
+            <div>
+                <label for="login-email" class="text-sm font-medium block mb-1">Email</label>
+                <div class="relative">
+                    <i data-lucide="mail" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="login-email" name="email" type="email" required placeholder="Ingresa tu email"
+                        class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div>
+                <label for="login-password" class="text-sm font-medium block mb-1">Contraseña</label>
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="login-password" name="password" type="password" required
+                        placeholder="Ingresa tu Contraseña" class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div id="login-message" class="text-sm text-red-500 hidden"></div>
+            <button type="submit"
+                class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">Ingresar</button>
+        </form>
+
+        <!-- Sign-Up Form -->
+        <form id="form-signup" class="space-y-4 hidden mt-6">
+            <div>
+                <label for="signup-name" class="text-sm font-medium block mb-1">Nombre Completo</label>
+                <div class="relative">
+                    <i data-lucide="user" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="signup-name" name="name" type="text" required placeholder="Ingresa tu Nombre"
+                        class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div>
+                <label for="signup-email" class="text-sm font-medium block mb-1">Email</label>
+                <div class="relative">
+                    <i data-lucide="mail" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="signup-email" name="email" type="email" required placeholder="Ingresa tu email"
+                        class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div>
+                <label for="signup-password" class="text-sm font-medium block mb-1">Contraseña</label>
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="signup-password" name="password" type="password" required minlength="6"
+                        placeholder="Ingresa tu Contraseña" class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+                <p class="text-xs text-gray-500 mt-1">La Contraseña debe contener al menos 6 caracteres</p>
+            </div>
+            <div>
+                <label for="signup-confirm" class="text-sm font-medium block mb-1">Confirma tu Contraseña</label>
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input id="signup-confirm" name="confirmPassword" type="password" required minlength="6"
+                        placeholder="Confirma tu Contraseña" class="pl-10 w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div id="signup-message" class="text-sm text-red-500 hidden"></div>
+            <button type="submit"
+                class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">Crear Cuenta</button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-sm text-gray-600">
+            Al registrarte, aceptás nuestros
+            <a href="#" class="text-blue-600 hover:underline">Terminos</a> y
+            <a href="#" class="text-blue-600 hover:underline">Política de Privacidad</a>.
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+
+</html>
