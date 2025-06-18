@@ -3,15 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TaskFlow Trello-Style</title>
+  <title>TaskFlow</title>
   <link rel="stylesheet" href="/Estilos/style.css" />
 </head>
 <body>
-  <section class="form-section">
-    <h1 class="title-principal">TaskFlow</h1>
-    
+
+  <!-- Alerta flotante -->
+  <div id="alerta-exito" class="alerta">✅ Tarea creada con éxito</div>
+
+  <!-- Panel lateral (formulario) -->
+  <section class="form-section show" id="form-panel">
+
+    <!-- Header con botón de cerrar ☰ -->
+    <div class="navbar-header">
+      <button id="toggle-panel" class="toggle-panel">☰</button>
+      <h1 class="title-principal">TaskFlow</h1>
+    </div>
+
+    <!-- Campos del formulario -->
     <input type="text" id="task-title" placeholder="Agregar nombre de la tarea" />
-    
     <textarea id="task-desc" rows="3" placeholder="Agregar descripción de la tarea"></textarea>
     
     <select id="select-prioridad">
@@ -21,7 +31,7 @@
       <option value="Baja">🕓 Baja</option>
     </select>
 
-    <input type="date" id="task-deadline" min="" />
+    <input type="date" id="task-deadline" />
 
     <button id="create-task">Crear Tarea</button>
 
@@ -36,11 +46,15 @@
     </div>
   </section>
 
-  <main class="board" id="task-board">
-    <!-- Columnas se insertan dinámicamente -->
-  </main>
+  <!-- Borde para reabrir el panel cuando está cerrado -->
+  <div id="borde-toggle" class="panel-placeholder">
+    <button id="abrir-panel" class="toggle-panel">☰</button>
+  </div>
 
-  <!-- Modal -->
+  <!-- Tablero principal de tareas -->
+  <main class="board" id="task-board"></main>
+
+  <!-- Modal para ver, editar y eliminar tarea -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <h3 id="modal-title"></h3>
@@ -53,6 +67,7 @@
     </div>
   </div>
 
+  <!-- JS funcional -->
   <script src="/Dinamica/app.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const createBtn = document.getElementById("create-task");
   const filtroSelect = document.getElementById("filtro");
   const board = document.getElementById("task-board");
+  const alerta = document.getElementById("alerta-exito");
 
   const modal = document.getElementById("modal");
   const modalTitle = document.getElementById("modal-title");
@@ -16,37 +17,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const deleteBtn = document.getElementById("delete-task");
   const closeModal = document.getElementById("close-modal");
 
-  let allTasks = [];
+  const togglePanel = document.getElementById("toggle-panel");
+  const formPanel = document.getElementById("form-panel");
+
+  const bordeToggle = document.getElementById("borde-toggle");
+  const abrirPanelBtn = document.getElementById("abrir-panel");
+
+  let allTasks = JSON.parse(localStorage.getItem("taskflow_tasks")) || [];
   let selectedTask = null;
 
-  // Establecer fecha mínima como hoy
- const today=new Date().toISOString().split("T")[0];
- deadlineInput.setAttribute("min",today);
+  const today = new Date().toISOString().split("T")[0];
+  deadlineInput.setAttribute("min", today);
+
+  // Cerrar panel y mostrar borde
+  togglePanel.addEventListener("click", () => {
+    formPanel.classList.remove("show");
+    bordeToggle.classList.add("show");
+  });
+
+  // Abrir panel al hacer clic en el borde izquierdo
+  abrirPanelBtn.addEventListener("click", () => {
+    formPanel.classList.add("show");
+    bordeToggle.classList.remove("show");
+  });
+
+  function showAlerta() {
+    alerta.style.display = "block";
+    setTimeout(() => alerta.style.display = "none", 2000);
+  }
+
+  function guardarEnLocalStorage() {
+    localStorage.setItem("taskflow_tasks", JSON.stringify(allTasks));
+  }
 
   function crearColumna(index) {
     const col = document.createElement("div");
     col.classList.add("column");
-    col.setAttribute("data-index", index);
     const title = document.createElement("h3");
-    title.textContent = "Tareas " + (index * 9 + 1) + " - " + ((index + 1) * 9);
+    title.textContent = `Tareas ${index * 9 + 1} - ${index * 9 + 9}`;
     title.classList.add("column-title");
     col.appendChild(title);
     board.appendChild(col);
     return col;
   }
 
-  function renderTareas() {
+  function renderTareas(tareas = allTasks) {
     board.innerHTML = "";
-    let columnaActual = null;
-    allTasks.forEach((task, index) => {
-      if (index % 9 === 0) {
-        columnaActual = crearColumna(Math.floor(index / 9));
-      }
-      const tareaDiv = document.createElement("div");
-      tareaDiv.classList.add("tarea");
-      tareaDiv.textContent = `${task.titulo} (${task.prioridad})`;
-
-      tareaDiv.addEventListener("click", () => {
+    let columna = null;
+    tareas.forEach((task, i) => {
+      if (i % 9 === 0) columna = crearColumna(Math.floor(i / 9));
+      const div = document.createElement("div");
+      div.classList.add("tarea");
+      div.textContent = `${task.titulo} (${task.prioridad})`;
+      div.addEventListener("click", () => {
         selectedTask = task;
         modalTitle.textContent = task.titulo;
         modalDesc.textContent = task.descripcion || "Sin descripción";
@@ -54,8 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modalFechas.textContent = `Inicio: ${task.fechaInicio} | Entrega: ${task.fechaEntrega}`;
         modal.style.display = "flex";
       });
-
-      columnaActual.appendChild(tareaDiv);
+      columna.appendChild(div);
     });
   }
 
@@ -75,78 +97,58 @@ document.addEventListener("DOMContentLoaded", () => {
       titulo,
       descripcion,
       prioridad,
-      fechaInicio: new Date().toLocaleDateString(),
+      fechaInicio: today,
       fechaEntrega
     };
 
     allTasks.push(nuevaTarea);
+    guardarEnLocalStorage();
     renderTareas();
+    showAlerta();
 
-    // Reset inputs
     titleInput.value = "";
     descInput.value = "";
     prioridadInput.selectedIndex = 0;
     deadlineInput.value = "";
+
+    // Responsive: cerrar panel y mostrar borde
+    formPanel.classList.remove("show");
+    bordeToggle.classList.add("show");
   });
 
-  closeModal.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
+  closeModal.addEventListener("click", () => modal.style.display = "none");
 
   deleteBtn.addEventListener("click", () => {
     allTasks = allTasks.filter(t => t.id !== selectedTask.id);
-    modal.style.display = "none";
+    guardarEnLocalStorage();
     renderTareas();
+    modal.style.display = "none";
   });
 
   editBtn.addEventListener("click", () => {
     const nuevoTitulo = prompt("Editar título:", selectedTask.titulo);
     const nuevaDesc = prompt("Editar descripción:", selectedTask.descripcion);
     const nuevaFecha = prompt("Editar fecha de entrega:", selectedTask.fechaEntrega);
-
     if (nuevoTitulo) selectedTask.titulo = nuevoTitulo;
     if (nuevaDesc !== null) selectedTask.descripcion = nuevaDesc;
     if (nuevaFecha) selectedTask.fechaEntrega = nuevaFecha;
-
+    guardarEnLocalStorage();
     renderTareas();
     modal.style.display = "none";
   });
 
   filtroSelect.addEventListener("change", () => {
-    const criterio = filtroSelect.value;
     let tareasFiltradas = [...allTasks];
-
-    if (criterio === "Prioridad") {
-      tareasFiltradas.sort((a, b) => {
-        const orden = { "Alta": 1, "Media": 2, "Baja": 3 };
-        return orden[a.prioridad] - orden[b.prioridad];
-      });
-    } else if (criterio === "Inicio") {
+    if (filtroSelect.value === "Prioridad") {
+      const orden = { "Alta": 1, "Media": 2, "Baja": 3 };
+      tareasFiltradas.sort((a, b) => orden[a.prioridad] - orden[b.prioridad]);
+    } else if (filtroSelect.value === "Inicio") {
       tareasFiltradas.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
-    } else if (criterio === "Entrega") {
+    } else if (filtroSelect.value === "Entrega") {
       tareasFiltradas.sort((a, b) => new Date(a.fechaEntrega) - new Date(b.fechaEntrega));
     }
-
-    board.innerHTML = "";
-    let columnaActual = null;
-    tareasFiltradas.forEach((task, index) => {
-      if (index % 9 === 0) {
-        columnaActual = crearColumna(Math.floor(index / 9));
-      }
-      const tareaDiv = document.createElement("div");
-      tareaDiv.classList.add("tarea");
-      tareaDiv.textContent = `${task.titulo} (${task.prioridad})`;
-
-      tareaDiv.addEventListener("click", () => {
-        selectedTask = task;
-        modalTitle.textContent = task.titulo;
-        modalDesc.textContent = task.descripcion || "Sin descripción";
-        modalPriority.textContent = "Prioridad: " + task.prioridad;
-        modalFechas.textContent = `Inicio: ${task.fechaInicio} | Entrega: ${task.fechaEntrega}`;
-        modal.style.display = "flex";
-      });
-
-      columnaActual.appendChild(tareaDiv);
-    });
+    renderTareas(tareasFiltradas);
   });
+
+  renderTareas();
 });
