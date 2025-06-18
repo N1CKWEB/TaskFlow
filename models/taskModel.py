@@ -38,3 +38,19 @@ def obtener_tareas(id_usuario):
     # 4. Cerrar conexión y devolver
     conn.close()
     return tareas
+
+
+def actualizar_tarea_por_id(id_tarea, nombre, descripcion, prioridad, tiempo_estimado, id_usuario):
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            UPDATE tareas
+            SET nombre = %s,
+                descripcion = %s,
+                prioridad = %s,
+                tiempo_estimado = %s,
+                id_usuario = %s
+            WHERE id_tarea = %s
+        """, (nombre, descripcion, prioridad, tiempo_estimado, id_usuario, id_tarea))
+    conn.commit()
+    conn.close()

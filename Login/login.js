@@ -1,4 +1,4 @@
-// Tabs
+// Tabs 
 const loginTab = document.getElementById('tab-login');
 const signupTab = document.getElementById('tab-signup');
 const loginForm = document.getElementById('form-login');
@@ -56,11 +56,11 @@ loginForm.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
+            // ✅ Guardar ID del usuario en localStorage
+            localStorage.setItem("usuario_id", data.id_usuario);
+
             alert("Bienvenido, " + data.nombre_completo);
             window.location.href = '../index.html';
-
-            // Guardar en localStorage si querés:
-            // localStorage.setItem('usuario', JSON.stringify(data));
         } else {
             msg.textContent = data.mensaje || "Credenciales incorrectas.";
             msg.classList.remove('hidden');
@@ -125,8 +125,7 @@ signupForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             alert("Usuario registrado con éxito");
             signupForm.reset();
-            // Redirigir o cambiar a la pestaña login automáticamente si querés:
-            loginTab.click();
+            loginTab.click(); // Cambiar a pestaña login automáticamente
         } else {
             msg.textContent = data.error || "Error al registrar usuario.";
             msg.classList.remove('hidden');

@@ -13,29 +13,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalDesc = document.getElementById("modal-desc");
   const modalPriority = document.getElementById("modal-priority");
   const modalFechas = document.getElementById("modal-fechas");
+  const modalDeadline = document.getElementById("modal-deadline");
+  const saveBtn = document.getElementById("save-task");
   const editBtn = document.getElementById("edit-task");
   const deleteBtn = document.getElementById("delete-task");
   const closeModal = document.getElementById("close-modal");
 
   const togglePanel = document.getElementById("toggle-panel");
   const formPanel = document.getElementById("form-panel");
-
   const bordeToggle = document.getElementById("borde-toggle");
   const abrirPanelBtn = document.getElementById("abrir-panel");
 
-  let allTasks = JSON.parse(localStorage.getItem("taskflow_tasks")) || [];
+  let allTasks = [];
   let selectedTask = null;
-
   const today = new Date().toISOString().split("T")[0];
   deadlineInput.setAttribute("min", today);
 
-  // Cerrar panel y mostrar borde
+  async function cargarTareasDesdeBD() {
+    const id_usuario = localStorage.getItem("usuario_id");
+    if (!id_usuario) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/tareas/${id_usuario}`);
+      const tareas = await response.json();
+
+      allTasks = tareas.map(t => ({
+        id: t.id || t.id_tarea || Date.now(),
+        titulo: t.nombre,
+        descripcion: t.descripcion,
+        prioridad: t.prioridad,
+        fechaInicio: t.fecha_inicio || today,
+        fechaEntrega: t.tiempo_estimado || today
+      }));
+
+      renderTareas();
+    } catch (error) {
+      console.error("Error al cargar tareas:", error);
+    }
+  }
+
   togglePanel.addEventListener("click", () => {
     formPanel.classList.remove("show");
     bordeToggle.classList.add("show");
   });
 
-  // Abrir panel al hacer clic en el borde izquierdo
   abrirPanelBtn.addEventListener("click", () => {
     formPanel.classList.add("show");
     bordeToggle.classList.remove("show");
@@ -43,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showAlerta() {
     alerta.style.display = "block";
-    setTimeout(() => alerta.style.display = "none", 2000);
+    setTimeout(() => (alerta.style.display = "none"), 2000);
   }
 
   function guardarEnLocalStorage() {
@@ -71,21 +92,28 @@ document.addEventListener("DOMContentLoaded", () => {
       div.textContent = `${task.titulo} (${task.prioridad})`;
       div.addEventListener("click", () => {
         selectedTask = task;
-        modalTitle.textContent = task.titulo;
-        modalDesc.textContent = task.descripcion || "Sin descripción";
+        modalTitle.value = task.titulo;
+        modalDesc.value = task.descripcion || "Sin descripción";
         modalPriority.textContent = "Prioridad: " + task.prioridad;
+        modalDeadline.value = task.fechaEntrega;
         modalFechas.textContent = `Inicio: ${task.fechaInicio} | Entrega: ${task.fechaEntrega}`;
         modal.style.display = "flex";
+        modalTitle.disabled = true;
+        modalDesc.disabled = true;
+        modalDeadline.disabled = true;
+        saveBtn.style.display = "none";
+        editBtn.style.display = "inline-block";
       });
       columna.appendChild(div);
     });
   }
 
-  createBtn.addEventListener("click", () => {
+  createBtn.addEventListener("click", async () => {
     const titulo = titleInput.value.trim();
     const descripcion = descInput.value.trim();
     const prioridad = prioridadInput.value;
     const fechaEntrega = deadlineInput.value;
+    const id_usuario = localStorage.getItem("usuario_id");
 
     if (!titulo || !prioridad || !fechaEntrega) {
       alert("Completá todos los campos requeridos.");
@@ -98,49 +126,128 @@ document.addEventListener("DOMContentLoaded", () => {
       descripcion,
       prioridad,
       fechaInicio: today,
-      fechaEntrega
+      fechaEntrega,
     };
 
-    allTasks.push(nuevaTarea);
-    guardarEnLocalStorage();
-    renderTareas();
-    showAlerta();
+    try {
+      const response = await fetch("http://localhost:5000/tareas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: titulo,
+          descripcion: descripcion || "Sin descripción",
+          prioridad: prioridad,
+          tiempo_estimado: fechaEntrega,
+          id_usuario: parseInt(id_usuario)
+        })
+      });
 
-    titleInput.value = "";
-    descInput.value = "";
-    prioridadInput.selectedIndex = 0;
-    deadlineInput.value = "";
+      const data = await response.json();
 
-    // Responsive: cerrar panel y mostrar borde
-    formPanel.classList.remove("show");
-    bordeToggle.classList.add("show");
+      if (!response.ok) {
+        console.error("Error al guardar:", data);
+        alert(data.error || "Error al guardar en la base de datos.");
+        return;
+      }
+
+      allTasks.push(nuevaTarea);
+      guardarEnLocalStorage();
+      renderTareas();
+      showAlerta();
+
+      titleInput.value = "";
+      descInput.value = "";
+      prioridadInput.selectedIndex = 0;
+      deadlineInput.value = "";
+
+      formPanel.classList.remove("show");
+      bordeToggle.classList.add("show");
+
+    } catch (error) {
+      console.error("Error al conectar con el backend:", error);
+      alert("Error de conexión con el servidor.");
+    }
   });
 
-  closeModal.addEventListener("click", () => modal.style.display = "none");
+  closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
 
   deleteBtn.addEventListener("click", () => {
-    allTasks = allTasks.filter(t => t.id !== selectedTask.id);
+    allTasks = allTasks.filter((t) => t.id !== selectedTask.id);
     guardarEnLocalStorage();
     renderTareas();
     modal.style.display = "none";
   });
 
   editBtn.addEventListener("click", () => {
-    const nuevoTitulo = prompt("Editar título:", selectedTask.titulo);
-    const nuevaDesc = prompt("Editar descripción:", selectedTask.descripcion);
-    const nuevaFecha = prompt("Editar fecha de entrega:", selectedTask.fechaEntrega);
-    if (nuevoTitulo) selectedTask.titulo = nuevoTitulo;
-    if (nuevaDesc !== null) selectedTask.descripcion = nuevaDesc;
-    if (nuevaFecha) selectedTask.fechaEntrega = nuevaFecha;
-    guardarEnLocalStorage();
-    renderTareas();
-    modal.style.display = "none";
+    modalTitle.disabled = false;
+    modalDesc.disabled = false;
+    modalDeadline.disabled = false;
+    saveBtn.style.display = "inline-block";
+    editBtn.style.display = "none";
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    const nuevoTitulo = modalTitle.value.trim();
+    const nuevaDesc = modalDesc.value.trim();
+    const nuevaFecha = modalDeadline.value;
+    const id_usuario = localStorage.getItem("usuario_id");
+
+    if (!nuevoTitulo || !nuevaFecha || !selectedTask.prioridad || !id_usuario) {
+      alert("Faltan datos para actualizar la tarea.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/tareas/${selectedTask.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre: nuevoTitulo,
+          descripcion: nuevaDesc || "Sin descripción",
+          prioridad: selectedTask.prioridad,
+          tiempo_estimado: nuevaFecha,
+          id_usuario: parseInt(id_usuario)
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error al actualizar:", data);
+        alert(data.error || "No se pudo actualizar la tarea.");
+        return;
+      }
+
+      selectedTask.titulo = nuevoTitulo;
+      selectedTask.descripcion = nuevaDesc;
+      selectedTask.fechaEntrega = nuevaFecha;
+
+      guardarEnLocalStorage();
+      renderTareas();
+      showAlerta();
+
+      modal.style.display = "none";
+      saveBtn.style.display = "none";
+      editBtn.style.display = "inline-block";
+
+      modalTitle.disabled = true;
+      modalDesc.disabled = true;
+      modalDeadline.disabled = true;
+
+    } catch (error) {
+      console.error("Error en PUT:", error);
+      alert("Error de red al intentar actualizar la tarea.");
+    }
   });
 
   filtroSelect.addEventListener("change", () => {
     let tareasFiltradas = [...allTasks];
     if (filtroSelect.value === "Prioridad") {
-      const orden = { "Alta": 1, "Media": 2, "Baja": 3 };
+      const orden = { Alta: 1, Media: 2, Baja: 3 };
       tareasFiltradas.sort((a, b) => orden[a.prioridad] - orden[b.prioridad]);
     } else if (filtroSelect.value === "Inicio") {
       tareasFiltradas.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
@@ -150,5 +257,5 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTareas(tareasFiltradas);
   });
 
-  renderTareas();
+  cargarTareasDesdeBD();
 });
