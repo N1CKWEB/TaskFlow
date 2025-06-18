@@ -250,3 +250,22 @@ button {
   display: block;
 }
 
+.modal-input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  background-color: #000;
+}
+
+.modal-text {
+  font-weight: bold;
+  margin: 10px 0 5px;
+}
+
+.modal-text-small {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 15px;
+}
