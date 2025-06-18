@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow Trello-Style</title>
+  <link rel="stylesheet" href="/Estilos/style.css" />
+</head>
+<body>
+  <section class="form-section">
+    <h1 class="title-principal">TaskFlow</h1>
+    
+    <input type="text" id="task-title" placeholder="Agregar nombre de la tarea" />
+    
+    <textarea id="task-desc" rows="3" placeholder="Agregar descripción de la tarea"></textarea>
+    
+    <select id="select-prioridad">
+      <option selected disabled>Prioridad</option>
+      <option value="Alta">🔥 Alta</option>
+      <option value="Media">⚠️ Media</option>
+      <option value="Baja">🕓 Baja</option>
+    </select>
+
+    <input type="date" id="task-deadline" min="" />
+
+    <button id="create-task">Crear Tarea</button>
+
+    <div class="filtro-container">
+      <label for="filtro">Filtrar:</label>
+      <select id="filtro">
+        <option value="Todas">Todas</option>
+        <option value="Prioridad">Prioridad</option>
+        <option value="Inicio">Fecha de Inicio</option>
+        <option value="Entrega">Fecha de Entrega</option>
+      </select>
+    </div>
+  </section>
+
+  <main class="board" id="task-board">
+    <!-- Columnas se insertan dinámicamente -->
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3 id="modal-title"></h3>
+      <p id="modal-desc"></p>
+      <p id="modal-priority"></p>
+      <p id="modal-fechas"></p>
+      <button id="edit-task">Editar</button>
+      <button id="delete-task">Eliminar</button>
+      <button id="close-modal">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="/Dinamica/app.js"></script>
+</body>
+</html>
