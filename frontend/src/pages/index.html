@@ -55,17 +55,24 @@
   <main class="board" id="task-board"></main>
 
   <!-- Modal para ver, editar y eliminar tarea -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h3 id="modal-title"></h3>
-      <p id="modal-desc"></p>
-      <p id="modal-priority"></p>
-      <p id="modal-fechas"></p>
-      <button id="edit-task">Editar</button>
-      <button id="delete-task">Eliminar</button>
-      <button id="close-modal">Cerrar</button>
-    </div>
+<!-- Modal para ver y editar tarea -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <input id="modal-title" type="text" disabled class="modal-input"/>
+    <textarea id="modal-desc" rows="3" disabled class="modal-input"></textarea>
+    
+    <p id="modal-priority" class="modal-priority"></p>
+    
+    <input id="modal-deadline" type="date" disabled class="modal-input"/>
+    <p id="modal-fechas"></p>
+
+    <button id="save-task">Guardar Cambios</button>
+    <button id="edit-task">Editar</button>
+    <button id="delete-task">Eliminar</button>
+    <button id="close-modal">Cerrar</button>
   </div>
+</div>
+
 
   <!-- JS funcional -->
   <script src="/Dinamica/app.js"></script>

@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "axe/forms": "off",
+    "button-type": "off",
+    "axe/name-role-value": "off",
+    "axe/parsing": "off",
+    "axe/text-alternatives": [
+      "off",
+      {
+        "document-title": "off"
+      }
+    ]
+  }
+}
