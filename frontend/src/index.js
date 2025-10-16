@@ -1,13 +1,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/index.css'; 
-import {App} from "./pages/App.jsx"
-
+import {Home} from "./pages/App.jsx"
 const root = createRoot(document.getElementById('root'));
 root.render(
 
   <React.StrictMode>
-    <App />
+
+    <Home />
+
   </React.StrictMode>
 
 );
