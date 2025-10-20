@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState } from "react";
-import "../../src/styles/App.css";
+import "../../src/styles/Home.css";
 
 export function Login() {
   const [activeTab, setActiveTab] = useState("login");
