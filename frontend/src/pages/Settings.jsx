@@ -1,4 +1,4 @@
-import '../../src/styles/App.css';
+import '../../src/styles/Home.css';
 import React, { useState } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
