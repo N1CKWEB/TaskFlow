@@ -6,10 +6,10 @@ import { RiLogoutBoxRLine } from "react-icons/ri";
 import userImg from '../assets/img/img-logo-perfil-user-new.png';
 import { Link } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
+import { IoCaretBackCircleOutline } from "react-icons/io5";
+
 
 export function dashboardTeam() {
-
-
 
  return (
 <div className="layout">
@@ -62,7 +62,14 @@ export function dashboardTeam() {
   </aside>
         
   <main className="content">
-        
+
+  <IoCaretBackCircleOutline />
+  <h2>Nombre del proyecto</h2>
+  
+
+  <div>
+    
+  </div>      
   
   </main>
 

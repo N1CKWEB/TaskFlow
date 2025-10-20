@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "../../src/styles/App.css";
 
-export function App() {
+export function Login() {
   const [activeTab, setActiveTab] = useState("login");
 
   return (
@@ -206,4 +206,4 @@ export function App() {
   );
 }
 
-export default Home;
+export default Login;
