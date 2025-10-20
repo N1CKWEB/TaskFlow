@@ -60,6 +60,7 @@ a:hover{
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  cursor: pointer;
 }
 .user-box {
   margin-top: auto;
@@ -174,6 +175,10 @@ a:hover{
   display: flex;
   justify-content: center;
   gap: 30px;
+  /* width: 200px;
+  height: 200px;
+  border-radius: 18px;
+  background-color: red; */
 }
 
 /* Acciones */
@@ -213,8 +218,110 @@ a:hover{
   color: white;
 }
 
+.card-new-project {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 480px;
+  background-color: #000;
+  border-radius: 20px;
+  padding: 25px 20px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
 
-.card-new-project{
-  width:480px;
-  height:500px;
+.title-new-project,
+.title-team {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.search-input-project,
+.search-input-members {
+  width: 100%;
+  height: 45px;
+  padding: 0 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background-color: #1f2e3c;
+  border: 1px solid #2d3f50;
+  color: white;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.member-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.icon-users {
+  cursor: pointer;
+  color: white;
+  font-size: 24px;
+}
+
+.button-user-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 60%;
+  max-width: 320px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgb(25, 27, 27);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin: 0 auto;
+  position: relative;
+  bottom: 20px;
+}
+.button-create-project{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgb(10, 196, 196);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin: 0 auto;
+  font-size: 18px;
+}
+.title-user-add {
+  display: inline-block;
+}
+
+/* Media queries para pantallas más pequeñas */
+@media (max-width: 500px) {
+  .card-new-project {
+    padding: 20px 15px;
+  }
+
+  .search-input-project,
+  .search-input-members {
+    font-size: 14px;
+    height: 40px;
+  }
+
+  .icon-users {
+    font-size: 20px;
+  }
+
+  .button-user-add {
+    height: 50px;
+    font-size: 14px;
+  }
 }
