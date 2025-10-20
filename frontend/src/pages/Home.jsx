@@ -104,7 +104,7 @@ async function crearProyecto() {
    
 
      {/* Card Projects */}
-   {/* {    
+   {    
 <div className='card-new-project'>
   <h2 className='title-new-project'>Titulo del Proyecto</h2>
   <input
@@ -151,7 +151,7 @@ async function crearProyecto() {
     <span className='title-user-add'>Crear Proyecto</span>
   </button> 
   </div>
-   } */}
+   }
    
 
   </div>
