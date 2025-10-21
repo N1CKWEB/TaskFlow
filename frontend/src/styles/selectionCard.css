@@ -1,0 +1,27 @@
+.selection-card {
+  background-color: #1e1e1e;
+  border-radius: 16px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.selection-card h2 {
+  color: white;
+  margin-bottom: 12px;
+}
+
+.user-img {
+  width: 60px;
+  border-radius: 50%;
+}
+
+.menu a {
+  display: block;
+  margin: 10px 0;
+  color: #bfbfbf;
+  text-decoration: none;
+}
+.menu a:hover {
+  color: #00d4ff;
+}
