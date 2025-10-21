@@ -1,0 +1,166 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #000;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    background: linear-gradient(145deg, #003547, #005f73);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 350px;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
+    transition: height 0.5s ease;
+}
+
+h1 {
+    text-align: center;
+    color: #00c9ff;
+    margin-bottom: 1rem;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.tabs button {
+    flex: 1;
+    padding: 0.5rem;
+    cursor: pointer;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+    border-radius: 6px 6px 0 0;
+    transition: background 0.5s ease;
+}
+
+.tabs button.active {
+    background: linear-gradient(to right, #00c9ff, #92fe9d);
+    color: black;
+}
+
+.forms-wrapper {
+    position: relative;
+}
+
+.form-container {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-50px);
+    /* sube 50px al aparecer */
+    transition: all 0.9s ease;
+}
+
+.form-container.active {
+    opacity: 1;
+    max-height: 600px;
+    /* suficiente para registro con select */
+    transform: translateY(0);
+}
+
+.form-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    color: #92fe9d;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-bottom: 2px solid white;
+    border-radius: 6px;
+    background: transparent;
+    color: white;
+    font-size: 14px;
+    appearance: none;
+    /* quita estilo por defecto de select */
+}
+
+select {
+    padding-right: 1.5rem;
+    /* espacio para flecha */
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-bottom: 2px solid #00c9ff;
+    transition: border-color 0.8s ease;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(to right, #00c9ff, #92fe9d);
+    color: black;
+    margin-top: 10px;
+    transition: background 0.5s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(to right, #92fe9d, #00c9ff);
+}
+
+.error {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+    text-align: center;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-bottom: 2px solid white;
+    border-radius: 6px;
+    background: transparent;
+    color: #92fe9d;
+    font-size: 14px;
+    appearance: none;
+    /* quita estilo por defecto de select */
+}
+
+select {
+    padding-right: 1.5rem;
+    /* espacio para flecha */
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-bottom: 2px solid #00c9ff;
+    transition: border-color 0.8s ease;
+}
+
+select option {
+    background: #003547;
+    /* mismo gradiente oscuro de la card, o un color sólido */
+    color: white;
+    /* color del texto */
+}
