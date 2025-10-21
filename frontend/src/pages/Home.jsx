@@ -8,7 +8,6 @@ import { RiUserStarFill } from "react-icons/ri";
 import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
-import { dashboardTeam } from "../pages/dashboardTeam"
 import { Link } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
 
