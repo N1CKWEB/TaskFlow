@@ -1,0 +1,6 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: var(--sidebar-bg, #2C2F36);
+  transition: background-color 0.3s ease;
+}
