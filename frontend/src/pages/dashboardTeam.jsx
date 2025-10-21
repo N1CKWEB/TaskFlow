@@ -72,8 +72,8 @@ export function dashboardTeam() {
 
     {/* Barra de progreso completado..  */}
     <div className='container-bar-progress'>
-
       <div className='barr-progress'/>
+
       <h2 className='tittle-bar--progress'>Progreso</h2>
       <h2 className='tittle-complete--progress'>Completado</h2>
       {/* <h2 className='number-complete--progress'></h2> */}
@@ -82,33 +82,69 @@ export function dashboardTeam() {
     <button className='button--projects'>
        <h2>Ver Proyectos</h2>      
     </button> 
+   
+    <div className='container-template'>
 
     {/* Cards To-Do */}
-    <div className='template-to-do' >
+    <div className='template' >
 
-      <h2 className='tittle-name' >To-Do</h2>
+      <h2 className='title-name' >To Do</h2>
       <FaEdit  className='icon-edit'/>
       <IoIosAddCircle className='icon-add'/>
-      
-      {/* Tarea  creada*/}
-      <div/>
 
+      {/*Punto de color  */}
+     <div className='template-color-to-do'/>
+  
+     {/* Tarea  creada*/}
+     <div className='complete-task-template'/>
+    
+       
     </div>
-
     
     {/* Cards In Progress */}
-    <div className='template-In-Progress' >
-      <h2 className='tittle-name'>In Progress</h2>
-      <FaEdit />
-      <IoIosAddCircle />
+    <div className='template' >
+
+      <h2 className='title-name--v'>In Progress</h2>
+      <FaEdit  className='icon-edit--v'/>
+      <IoIosAddCircle className='icon-add--v'/>
+
+      {/*Punto de color  */}
+     <div className='template-color-in-progress'/>
+      
+      {/* Tarea  creada*/}
+      <div className='complete-task-template'/>
+
+
     </div>
 
     {/* Cards Done */}
-    <div className='template-Done' >
-      <h2 className='tittle-name'>Done</h2>
-      <FaEdit />
-      <IoIosAddCircle />
-    </div>
+    <div className='template' >
+
+      <h2 className='title-name'>Done</h2>
+      <FaEdit  className='icon-edit'/>
+      <IoIosAddCircle className='icon-add'/>
+
+      {/*Punto de color  */}
+     <div className='template-color-done'/>
+      
+      {/* Tarea  creada*/}
+      <div className='complete-task-template'/>
+
+    </div> 
+      
+     {/* Template Members*/}
+    {
+      <div className='members-template'>
+      <h2 className='title-principal-membrers'>Miembros del equipo</h2>
+      <img src={userImg} // reemplazá por la foto real
+           className="user-avatar--members"/>  
+
+       <h2 className='title-name-user-avatar'>Nicolás Díaz</h2> 
+       <h3 className='rol-name-user-avatar'>Lider</h3>
+     </div>
+    }
+      
+  </div>
 
     </main>
 
