@@ -16,7 +16,7 @@ import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 
 
-export function dashboardTeam() {
+export function DashboardTeam() {
 
  return (
   
@@ -220,5 +220,5 @@ export function dashboardTeam() {
   );
 }
 
-export default dashboardTeam;
+export default DashboardTeam;
 

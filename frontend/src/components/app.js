@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!id_usuario) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/tareas/${id_usuario}`);
+      const response = await fetch(`http://localhost:3000/tareas/${id_usuario}`);
       const tareas = await response.json();
 
       allTasks = tareas.map(t => ({
