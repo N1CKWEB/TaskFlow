@@ -14,6 +14,7 @@ export function SelectionCard() {
       <h2>Selection Card</h2>
       <img src={userImg} alt="User" className="user-img" />
       <div className="menu">
+        
       </div>
     </div>
   );
