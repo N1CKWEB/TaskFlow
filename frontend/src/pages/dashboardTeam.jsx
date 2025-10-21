@@ -188,8 +188,10 @@ export function dashboardTeam() {
       {/* Horas programadas */}
       <input
         type="number"
-        className="input-hours"
-        placeholder="Horas programadas"
+        className="input-hours" 
+        placeholder="Horas programadas" 
+        min={1}
+        step={1}
       />
 
       {/* Condiciones */}
