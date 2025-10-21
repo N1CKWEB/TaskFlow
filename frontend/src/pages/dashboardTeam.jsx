@@ -10,6 +10,10 @@ import { GoProjectSymlink } from 'react-icons/go';
 import { IoCaretBackCircleOutline } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
+import { RiUserStarFill } from "react-icons/ri";
+import { GrUserManager } from "react-icons/gr";
+import { LiaUserPlusSolid } from "react-icons/lia";
+import { TbUserCode } from "react-icons/tb";
 
 
 export function dashboardTeam() {
@@ -129,7 +133,7 @@ export function dashboardTeam() {
       
       {/* Tarea  creada*/}
       <div className='complete-task-template'/>
-
+    
     </div> 
       
      {/* Template Members*/}
@@ -145,7 +149,69 @@ export function dashboardTeam() {
     }
       
   </div>
+   
+      {/* Card Crear Tarea */}
+    <div className="card-create-task">
 
+      <h2 className="title-create-task">Crear nueva tarea</h2>
+
+      {/* Nombre */}
+      <input
+        type="text"
+        className="input-task"
+        placeholder="Nombre de la tarea"
+      />
+
+      {/* Descripción */}
+      <textarea
+        className="textarea-task"
+        placeholder="Descripción de la tarea"
+      ></textarea>
+
+      {/* Prioridad */}
+      <select className="select-priority">
+        <option disabled selected>Prioridad</option>
+        <option value="Alta">🔥 Alta</option>
+        <option value="Media">⚠️ Media</option>
+        <option value="Baja">🕓 Baja</option>
+      </select>
+
+      {/* Fecha */}
+      <input
+        type="date"
+        className="input-date"
+        placeholder="Fecha de inicio"
+        
+        
+      />
+
+      {/* Horas programadas */}
+      <input
+        type="number"
+        className="input-hours" 
+        placeholder="Horas programadas" 
+        min={1}
+        step={1}
+
+      
+
+      {/* Condiciones */}
+      <input
+        type="text"
+        className="input-conditions"
+        placeholder="Condiciones de aceptación"
+      />
+
+      <button className="button-add-condition">
+        ➕ Agregar otra condición
+      </button>
+
+      <button className="button-create-task">
+        Crear tarea
+      </button>
+    </div>
+
+ 
     </main>
 
 

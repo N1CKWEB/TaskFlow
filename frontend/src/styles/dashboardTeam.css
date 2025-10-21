@@ -258,3 +258,120 @@ main.content {
     width: 90%;
   }
 }
+
+/* Card Crear Tarea */
+
+/* Card contenedor */
+.card-create-task {
+  background-color: #101315;
+  width: 100%;
+  max-width: 480px;
+  margin: 30px auto;
+  border-radius: 18px;
+  padding: 25px 30px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Título */
+.title-create-task {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Inputs generales */
+.input-task,
+.textarea-task,
+.select-priority,
+.input-date,
+.input-hours,
+.input-conditions {
+  background-color: #1b1e20;
+  color: #e5e5e5;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+.input-date::-webkit-calendar-picker-indicator {
+  filter: invert(69%) sepia(91%) saturate(500%) hue-rotate(150deg);
+  cursor: pointer;
+}
+.input-task::placeholder,
+.textarea-task::placeholder,
+.input-hours::placeholder,
+.input-conditions::placeholder {
+  color: #7c7c7c;
+}
+
+.input-task:focus,
+.textarea-task:focus,
+.input-hours:focus,
+.input-conditions:focus,
+.select-priority:focus,
+.input-date:focus {
+  border: 1px solid rgb(10, 210, 210);
+}
+
+/* Textarea */
+.textarea-task {
+  height: 90px;
+  resize: none;
+}
+
+/* Select */
+.select-priority {
+  cursor: pointer;
+}
+
+/* Botón agregar condición */
+.button-add-condition {
+  background-color: #202224;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.button-add-condition:hover {
+  background-color: #303436;
+}
+
+/* Botón crear tarea */
+.button-create-task {
+  background-color: rgb(10, 210, 210);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.button-create-task:hover {
+  background-color: rgb(14, 240, 240);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card-create-task {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .title-create-task {
+    font-size: 18px;
+  }
+}

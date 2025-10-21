@@ -6,6 +6,7 @@ import { RiLogoutBoxRLine } from "react-icons/ri";
 import userImg from '../assets/img/img-logo-perfil-user-new.png';
 import { Link } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
+import { SelectionCard } from '../components/selectionCard.jsx';
 
 export function Settings() {
 
@@ -60,10 +61,10 @@ export function Settings() {
         </div>
 
   </aside>
-        
-      <main className="content">
-        
-      </main>
+  <main className="content">
+         
+      <SelectionCard />
+  </main>
 
 
 </div>
