@@ -9,7 +9,8 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: linear-gradient(#0a1227, #0c7fa6); /* Podés cambiar colores */
+  background: linear-gradient(#0a1227, #0c7fa6);
+  /* Podés cambiar colores */
   color: white;
   padding: 20px;
   display: flex;
@@ -17,7 +18,7 @@
   justify-content: space-between;
 }
 
-.sidebar-line{
+.sidebar-line {
   display: flex;
   margin-top: 10px;
   color: gray;
@@ -26,6 +27,7 @@
   position: relative;
   right: 30px;
 }
+
 .menu {
   display: flex;
   flex-direction: column;
@@ -33,7 +35,7 @@
   margin-top: 40px;
 }
 
-a{
+a {
   position: relative;
   bottom: 10px;
   margin-right: 60px;
@@ -41,7 +43,8 @@ a{
   justify-content: center;
   text-align: center;
 }
-.icons{
+
+.icons {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +54,7 @@ a{
   font-size: 20px;
 }
 
-a:hover{
+a:hover {
   height: 50px;
   width: 100%;
   border-radius: 10px;
@@ -62,6 +65,7 @@ a:hover{
   margin: 0 auto;
   cursor: pointer;
 }
+
 .user-box {
   margin-top: auto;
   padding: 12px 10px;
@@ -81,22 +85,25 @@ a:hover{
   cursor: pointer;
   position: relative;
   top: 10px;
-  padding: 1px 12px 1px 1px; 
+  padding: 1px 12px 1px 1px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
-.logout-button:hover{
+
+.logout-button:hover {
   background-color: red;
   border-radius: 12px;
 }
-.icon-logout{
+
+.icon-logout {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  top:20px;
+  top: 20px;
   font-size: 20px;
 }
+
 .user-info {
   display: flex;
   align-items: center;
@@ -188,14 +195,15 @@ a:hover{
   gap: 20px;
 }
 
-.title-actions{
+.title-actions {
   font-size: 22px;
   font-weight: bold;
   margin-top: 40px;
-  color:white;
+  color: white;
 }
 
-.new-btn, .import-btn {
+.new-btn,
+.import-btn {
 
   padding: 12px 24px;
   border-radius: 10px;
@@ -212,11 +220,12 @@ a:hover{
 }
 
 .import-btn {
-  
+
   background-color: #05111d;
   color: white;
 }
 
+/* --- Animaciones de aparición y cierre --- */
 .card-new-project {
   display: flex;
   flex-direction: column;
@@ -226,8 +235,76 @@ a:hover{
   border-radius: 20px;
   padding: 25px 20px;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 30px auto 0 auto;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
+
+/* --- Animaciones de aparición y cierre (horizontal) --- */
+.card-new-project.opening {
+  animation: fadeInLeft 0.6s ease forwards;
+}
+
+.card-new-project.closing {
+  animation: fadeOutRight 0.5s ease forwards;
+  pointer-events: none;
+}
+
+/* Aparece desde la izquierda */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Desaparece hacia la derecha */
+@keyframes fadeOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+
+/* Botón cerrar */
+.button-close-project {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  height: 50px;
+  border-radius: 20px;
+  background-color: #ff4b4b;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin: 15px auto 0;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.button-close-project:hover {
+  background-color: #ff7070;
+}
+
+.buttons-project-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 
 .title-new-project,
 .title-team {
@@ -282,7 +359,8 @@ a:hover{
   position: relative;
   bottom: 20px;
 }
-.button-create-project{
+
+.button-create-project {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,6 +377,7 @@ a:hover{
   margin: 0 auto;
   font-size: 18px;
 }
+
 .title-user-add {
   display: inline-block;
 }
@@ -323,4 +402,35 @@ a:hover{
     height: 50px;
     font-size: 14px;
   }
+}
+
+/* Animación de entrada de nuevos campos */
+.fadeIn {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón de eliminar desarrollador */
+.delete-dev-btn {
+  background: none;
+  border: none;
+  color: #ff4b4b;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.delete-dev-btn:hover {
+  color: #ff7070;
 }
