@@ -9,6 +9,7 @@ import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { GoProjectSymlink } from 'react-icons/go';
+import { FaTimes } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
 export function Home() {
@@ -32,9 +33,15 @@ export function Home() {
     setDesarrolladores([...desarrolladores, ""]);
   };
 
-  const handleChangeDesarrollador = (index, value) => {
+  const manejarCambio = (index, value) => {
     const nuevos = [...desarrolladores];
     nuevos[index] = value;
+    setDesarrolladores(nuevos);
+  };
+
+  const eliminarDesarrollador = (index) => {
+    const nuevos = [...desarrolladores];
+    nuevos.splice(index, 1);
     setDesarrolladores(nuevos);
   };
 
@@ -113,7 +120,6 @@ export function Home() {
 
         <h3 className='title-actions'>Proyectos</h3>
 
-        {/* 🟢 GRID DE PROYECTOS */}
         <div className="project-grid">
           {proyectos.map(proyecto => (
             <div
@@ -127,7 +133,6 @@ export function Home() {
           ))}
         </div>
 
-        {/* 🟢 BOTONES DE ACCIÓN */}
         <div className="actions">
           {!mostrarFormulario && (
             <>
@@ -137,7 +142,6 @@ export function Home() {
           )}
         </div>
 
-        {/* 🟢 FORMULARIO NUEVO PROYECTO */}
         {mostrarFormulario && (
           <div className={`card-new-project ${animando}`}>
             <h2 className='title-new-project'>Título del Proyecto</h2>
@@ -170,15 +174,24 @@ export function Home() {
             </div>
 
             {desarrolladores.map((dev, index) => (
-              <div key={index} className="member-input">
+              <div key={index} className="member-input fadeIn">
                 <TbUserCode className='icon-users' />
                 <input
                   type="text"
                   className="search-input-members"
-                  placeholder="Introduce el nombre del desarrollador"
+                  placeholder={`Desarrollador ${index + 1}`}
                   value={dev}
-                  onChange={(e) => handleChangeDesarrollador(index, e.target.value)}
+                  onChange={(e) => manejarCambio(index, e.target.value)}
                 />
+                {desarrolladores.length > 1 && (
+                  <button
+                    type="button"
+                    className="delete-dev-btn"
+                    onClick={() => eliminarDesarrollador(index)}
+                  >
+                    <FaTimes />
+                  </button>
+                )}
               </div>
             ))}
 
