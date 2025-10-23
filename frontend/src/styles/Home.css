@@ -7,14 +7,14 @@
 
 /* === Sidebar === */
 
-.sidebar { 
+.sidebar {
   width: 250px;
   height: 100vh;
-  background: linear-gradient(#0a1227, #0c7fa6); 
-  color: white; 
-  display: flex; 
-  flex-direction: column; 
-  justify-content: space-between; 
+  background: linear-gradient(#0a1227, #0c7fa6);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* Home.css */
@@ -88,32 +88,37 @@ a:hover {
 }
 
 .logout-button {
-  background: transparent;
-  border: none;
-  color: white;
-  font-weight: bold;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 600;
   font-size: 16px;
   text-align: center;
   cursor: pointer;
-  position: relative;
-  top: 10px;
-  padding: 1px 12px 1px 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
 }
 
 .logout-button:hover {
-  background-color: red;
-  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
 }
 
 .icon-logout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  top: 20px;
   font-size: 20px;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.logout-button:hover .icon-logout {
+  transform: translateX(4px);
 }
 
 .user-info {
@@ -445,4 +450,71 @@ a:hover {
 
 .delete-dev-btn:hover {
   color: #ff7070;
+}
+
+/* === GRID DE PROYECTOS === */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+  padding: 10px 0;
+  justify-items: center;
+}
+
+/* === TARJETA DE PROYECTO === */
+.project-card {
+  width: 220px;
+  height: 180px;
+  border-radius: 18px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Siglas grandes (iniciales del proyecto) */
+.project-initials {
+  font-size: 48px;
+  font-weight: bold;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Nombre del proyecto */
+.project-name {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  color: white;
+}
+
+/* Animación de aparición de nuevas tarjetas */
+.project-card {
+  animation: fadeInCard 0.4s ease both;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

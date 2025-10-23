@@ -9,43 +9,59 @@ import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { GoProjectSymlink } from 'react-icons/go';
-import { FaTimes } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
 export function Home() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [animando, setAnimando] = useState(false);
+  const [proyectos, setProyectos] = useState([]);
+  const [nuevoProyecto, setNuevoProyecto] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
 
-  // 👉 Mostrar el CRUD
   const handleCrearProyecto = () => {
     setMostrarFormulario(true);
     setAnimando("opening");
   };
 
-  // 👉 Cerrar el CRUD con animación
   const handleCerrarFormulario = () => {
     setAnimando("closing");
     setTimeout(() => setMostrarFormulario(false), 500);
   };
 
-  // 👉 Agregar un nuevo campo de desarrollador
-  const agregarDesarrollador = () => {
+  const handleAgregarDesarrollador = () => {
     setDesarrolladores([...desarrolladores, ""]);
   };
 
-  // 👉 Eliminar un campo específico
-  const eliminarDesarrollador = (index) => {
-    const nuevos = [...desarrolladores];
-    nuevos.splice(index, 1);
-    setDesarrolladores(nuevos);
-  };
-
-  // 👉 Actualizar el valor de un campo
-  const manejarCambio = (index, value) => {
+  const handleChangeDesarrollador = (index, value) => {
     const nuevos = [...desarrolladores];
     nuevos[index] = value;
     setDesarrolladores(nuevos);
+  };
+
+  const handleCrearProyectoFinal = () => {
+    if (nuevoProyecto.trim() === "") return;
+
+    const siglas = nuevoProyecto
+      .split(" ")
+      .map(p => p[0].toUpperCase())
+      .join("")
+      .slice(0, 3);
+
+    const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
+    const colorRandom = colores[Math.floor(Math.random() * colores.length)];
+
+    const nuevo = {
+      id: Date.now(),
+      nombre: nuevoProyecto,
+      siglas,
+      color: colorRandom,
+      desarrolladores
+    };
+
+    setProyectos([...proyectos, nuevo]);
+    setNuevoProyecto("");
+    setDesarrolladores([""]);
+    handleCerrarFormulario();
   };
 
   return (
@@ -73,7 +89,7 @@ export function Home() {
         <div className="user-box">
           <button className="logout-button">
             <RiLogoutBoxRLine className='icon-logout' />
-            Cerrar Sesión
+            <span>Cerrar Sesión</span>
           </button>
           <div className="user-info">
             <img src={userImg} className="user-avatar" />
@@ -96,8 +112,23 @@ export function Home() {
         />
 
         <h3 className='title-actions'>Proyectos</h3>
+
+        {/* 🟢 GRID DE PROYECTOS */}
+        <div className="project-grid">
+          {proyectos.map(proyecto => (
+            <div
+              key={proyecto.id}
+              className="project-card"
+              style={{ backgroundColor: proyecto.color }}
+            >
+              <div className="project-initials">{proyecto.siglas}</div>
+              <p className="project-name">{proyecto.nombre}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 🟢 BOTONES DE ACCIÓN */}
         <div className="actions">
-          {/* ✅ Mostrar botones solo cuando el formulario NO está visible */}
           {!mostrarFormulario && (
             <>
               <button onClick={handleCrearProyecto} className="new-btn">+ Nuevo Proyecto</button>
@@ -106,7 +137,7 @@ export function Home() {
           )}
         </div>
 
-        {/* ✅ Mostrar formulario solo cuando mostrarFormulario es true */}
+        {/* 🟢 FORMULARIO NUEVO PROYECTO */}
         {mostrarFormulario && (
           <div className={`card-new-project ${animando}`}>
             <h2 className='title-new-project'>Título del Proyecto</h2>
@@ -114,11 +145,12 @@ export function Home() {
               type="text"
               className="search-input-project"
               placeholder="Introduce el nombre del proyecto"
+              value={nuevoProyecto}
+              onChange={(e) => setNuevoProyecto(e.target.value)}
             />
 
             <h2 className='title-team'>Miembros del equipo</h2>
 
-            {/* Dueño */}
             <div className="member-input">
               <RiUserStarFill className='icon-users' />
               <input
@@ -128,7 +160,6 @@ export function Home() {
               />
             </div>
 
-            {/* Líder */}
             <div className="member-input">
               <GrUserManager className='icon-users' />
               <input
@@ -138,42 +169,26 @@ export function Home() {
               />
             </div>
 
-            {/* Desarrolladores dinámicos */}
             {desarrolladores.map((dev, index) => (
-              <div key={index} className="member-input fadeIn">
+              <div key={index} className="member-input">
                 <TbUserCode className='icon-users' />
                 <input
                   type="text"
                   className="search-input-members"
-                  placeholder={`Desarrollador ${index + 1}`}
+                  placeholder="Introduce el nombre del desarrollador"
                   value={dev}
-                  onChange={(e) => manejarCambio(index, e.target.value)}
+                  onChange={(e) => handleChangeDesarrollador(index, e.target.value)}
                 />
-                {desarrolladores.length > 1 && (
-                  <button
-                    type="button"
-                    className="delete-dev-btn"
-                    onClick={() => eliminarDesarrollador(index)}
-                  >
-                    <FaTimes />
-                  </button>
-                )}
               </div>
             ))}
 
-            {/* Agregar más desarrolladores */}
-            <button
-              className='button-user-add'
-              type="button"
-              onClick={agregarDesarrollador}
-            >
+            <button onClick={handleAgregarDesarrollador} className='button-user-add'>
               <LiaUserPlusSolid className='icon-users' />
               <span className='title-user-add'>Agregar otro desarrollador</span>
             </button>
 
-            {/* Crear / Cerrar */}
             <div className="buttons-create-close">
-              <button className='button-create-project'>
+              <button onClick={handleCrearProyectoFinal} className='button-create-project'>
                 <span className='title-user-add'>Crear Proyecto</span>
               </button>
 
