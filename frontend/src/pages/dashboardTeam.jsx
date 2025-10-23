@@ -10,9 +10,22 @@ import { GoProjectSymlink } from 'react-icons/go';
 import { IoCaretBackCircleOutline } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
+import { RiUserStarFill } from "react-icons/ri";
+import { GrUserManager } from "react-icons/gr";
+import { LiaUserPlusSolid } from "react-icons/lia";
+import { TbUserCode } from "react-icons/tb";
 
 
-export function dashboardTeam() {
+export function DashboardTeam() {
+  
+  const [showForm,setShowForm] = useState(false)
+
+  const iconAdd=showForm ? "icon-add" : "card-create-task" 
+
+  const handleForm = () => {
+       setShowForm(!showForm)
+  }
+
 
  return (
   
@@ -66,73 +79,61 @@ export function dashboardTeam() {
     </aside>
           
     <main className="content">
-
     <IoCaretBackCircleOutline className='icon-project' />
     <h2 className='tittle-name-project' >Nombre del proyecto</h2>
 
-    {/* Barra de progreso completado..  */}
     <div className='container-bar-progress'>
       <div className='barr-progress'/>
 
       <h2 className='tittle-bar--progress'>Progreso</h2>
       <h2 className='tittle-complete--progress'>Completado</h2>
-      {/* <h2 className='number-complete--progress'></h2> */}
     </div>      
      
     <button className='button--projects'>
        <h2>Ver Proyectos</h2>      
     </button> 
    
+    
     <div className='container-template'>
 
-    {/* Cards To-Do */}
     <div className='template' >
 
       <h2 className='title-name' >To Do</h2>
       <FaEdit  className='icon-edit'/>
-      <IoIosAddCircle className='icon-add'/>
+      <IoIosAddCircle onClick={()=> setShowForm(true)} className='icon-add'/>
 
-      {/*Punto de color  */}
      <div className='template-color-to-do'/>
-  
-     {/* Tarea  creada*/}
+
      <div className='complete-task-template'/>
     
        
     </div>
     
-    {/* Cards In Progress */}
     <div className='template' >
 
       <h2 className='title-name--v'>In Progress</h2>
       <FaEdit  className='icon-edit--v'/>
-      <IoIosAddCircle className='icon-add--v'/>
+      <IoIosAddCircle onClick={()=> setShowForm(true)} className='icon-add--v'/>
 
-      {/*Punto de color  */}
      <div className='template-color-in-progress'/>
       
-      {/* Tarea  creada*/}
       <div className='complete-task-template'/>
 
 
     </div>
 
-    {/* Cards Done */}
     <div className='template' >
 
       <h2 className='title-name'>Done</h2>
       <FaEdit  className='icon-edit'/>
-      <IoIosAddCircle className='icon-add'/>
+      <IoIosAddCircle onClick={()=> setShowForm(true)} className='icon-add'/>
 
-      {/*Punto de color  */}
      <div className='template-color-done'/>
       
-      {/* Tarea  creada*/}
       <div className='complete-task-template'/>
-
+    
     </div> 
       
-     {/* Template Members*/}
     {
       <div className='members-template'>
       <h2 className='title-principal-membrers'>Miembros del equipo</h2>
@@ -145,14 +146,85 @@ export function dashboardTeam() {
     }
       
   </div>
+   
+   {showForm && (
 
-    </main>
+    <div className='overlay'>
+
+    <div  className="card-create-task">
 
 
-</div>
+      <h2 className="title-create-task">Crear nueva tarea</h2>
+
+      <input
+        type="text"
+        className="input-task"
+        placeholder="Nombre de la tarea"
+        />
+
+      <textarea
+        className="textarea-task"
+        placeholder="Descripción de la tarea"
+        ></textarea>
+
+      <select className="select-priority">
+        <option disabled selected>Prioridad</option>
+        <option value="Alta">🔥 Alta</option>
+        <option value="Media">⚠️ Media</option>
+        <option value="Baja">🕓 Baja</option>
+      </select>
+
+      <input
+        type="date"
+        className="input-date"
+        placeholder="Fecha de inicio"
+        
+        
+        />
+
+      <input
+        type="number"
+        className="input-hours" 
+        placeholder="Horas programadas" 
+        min={1}
+        step={1}
+        />
+      
+      <input
+        type="text"
+        className="input-conditions"
+        placeholder="Condiciones de aceptación"
+        />
+
+      <button className="button-add-condition">
+        ➕ Agregar otra condición
+      </button>
+
+      <button className="button-create-task">
+        Crear tarea
+      </button>
+    
+      <button onClick={()=> setShowForm(false)} className="button-close-task">
+       Cerrar 
+      </button>
+    
+      </div>
+   </div>
+    
+   )}
+
+  </main>
+  </div>
+  
+  
+  
+  
+ 
+
+
 
   );
 }
 
-export default dashboardTeam;
+export default DashboardTeam;
 

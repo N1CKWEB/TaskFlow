@@ -79,10 +79,9 @@ main.content {
 /* Cards */
 .container-template {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 40px;
-  margin-top: 70px;
+  gap: 20px;
+  margin-top: 50px;
 }
 
 .template {
@@ -258,3 +257,199 @@ main.content {
     width: 90%;
   }
 }
+
+/* Card Crear Tarea */
+/* Fondo oscuro del modal */
+.overlay {
+  position: fixed; /* cubre toda la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6); /* sombra transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100; /* que quede por encima del resto */
+}
+
+/* Tarjeta del formulario */
+.card-create-task {
+  background-color: #101315;
+  width: 90%;           /* ocupa casi todo en móviles */
+  max-width: 480px;     /* pero nunca más de 480px */
+  border-radius: 18px;
+  padding: 25px 30px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsivo: mejora en pantallas pequeñas */
+@media (max-width: 768px) {
+  .card-create-task {
+    padding: 20px;
+    border-radius: 14px;
+  }
+}
+
+
+/* Título */
+.title-create-task {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Inputs generales */
+.input-task,
+.textarea-task,
+.select-priority,
+.input-date,
+.input-hours,
+.input-conditions {
+  background-color: #1b1e20;
+  color: #e5e5e5;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+.input-date::-webkit-calendar-picker-indicator {
+  filter: invert(69%) sepia(91%) saturate(500%) hue-rotate(150deg);
+  cursor: pointer;
+}
+
+
+.input-task::placeholder,
+.textarea-task::placeholder,
+.input-hours::placeholder,
+.input-conditions::placeholder {
+  color: #7c7c7c;
+}
+
+.input-task:focus,
+.textarea-task:focus,
+.input-hours:focus,
+.input-conditions:focus,
+.select-priority:focus,
+.input-date:focus {
+  border: 1px solid rgb(10, 210, 210);
+}
+
+/* Textarea */
+.textarea-task {
+  height: 90px;
+  resize: none;
+}
+
+/* Select */
+.select-priority {
+  cursor: pointer;
+}
+
+/* Botón agregar condición */
+.button-add-condition {
+  background-color: #202224;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.button-add-condition:hover {
+  background-color: #303436;
+}
+
+/* Botón crear tarea */
+.button-create-task {
+  background-color: rgb(10, 210, 210);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.button-close-task{
+  background-color: rgb(131, 18, 18);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.button-close-task:hover{
+  background-color: rgb(255, 0, 0);
+  
+}
+.button-create-task:hover {
+  background-color: rgb(14, 240, 240);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card-create-task {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .title-create-task {
+    font-size: 18px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1592px) {
+  /* Card Members */
+.members-template {
+  width: 262px;
+  height: 331px;
+  position: absolute;
+  margin-left: 72%;
+  left: 100px;
+}
+/* Cards */
+.container-template {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+  position: static;
+  margin-right: 300px;
+}
+.title-name-user-avatar{
+ display: flex;
+ position: relative;
+ left: 60px;
+}
+.rol-name-user-avatar{
+  display: flex;
+  position: relative;
+  left: 60px;
+
+}
+}
+

@@ -6,6 +6,18 @@
 }
 
 /* === Sidebar === */
+
+.sidebar { 
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(#0a1227, #0c7fa6); 
+  color: white; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
+}
+
+/* Home.css */
 .sidebar {
   width: 250px;
   height: 100vh;
