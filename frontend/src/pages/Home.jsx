@@ -1,5 +1,5 @@
 import '../../src/styles/Home.css';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
@@ -23,6 +23,8 @@ export function Home() {
     setMostrarFormulario(true);
     setAnimando("opening");
   };
+
+
 
   const handleCerrarFormulario = () => {
     setAnimando("closing");
@@ -56,7 +58,8 @@ export function Home() {
 
     const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
     const colorRandom = colores[Math.floor(Math.random() * colores.length)];
-
+    
+    
     const nuevo = {
       id: Date.now(),
       nombre: nuevoProyecto,
