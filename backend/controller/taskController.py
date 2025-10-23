@@ -8,7 +8,7 @@ def nueva_tarea():
     data = request.get_json()
     
     # Verificamos que todos los campos necesarios estén presentes
-    if not all(key in data for key in ['nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 'id_usuario']):
+    if not all(key in data for key in ['nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 'horas', 'condiciones_aceptacion','id_usuario']):
         return jsonify({"error": "Faltan datos obligatorios"}), 400
 
     # Llamamos a la función del modelo pasando todos los datos necesarios
@@ -17,6 +17,8 @@ def nueva_tarea():
         data['descripcion'],
         data['prioridad'],
         data['tiempo_estimado'],
+        data['horas'],
+        data['condiciones_aceptacion'],
         data['id_usuario']
     )
 
