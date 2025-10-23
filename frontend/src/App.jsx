@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home.jsx";
 import DashboardTeam from "./pages/dashboardTeam.jsx";
 import Setting from "./pages/Settings.jsx";
-import Login from "./components/login.jsx";
+import Login from "./pages/login.jsx";
 
 function App() {
   return (

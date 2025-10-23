@@ -65,7 +65,7 @@
 }
 
 .color-section {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .color-section h3 {
@@ -97,4 +97,27 @@
 .save-button:hover {
   background: linear-gradient(90deg, #0096c7, #48cae4);
   transform: translateY(-2px);
+}
+
+/* .password-input::-webkit-scrollbar-track-piece {
+  filter: invert(69%) sepia(91%) saturate(500%) hue-rotate(150deg);
+  cursor: pointer;
+} */
+.color-picker{
+  width: 80px;
+  height: 50px;
+}
+@media (max-width: 1592px) {
+
+.selection-card{
+ padding: 38px;
+ margin: 20px auto; 
+}
+.color-section {
+  margin-top: 5px;
+}
+.color-picker{
+  width: 80px;
+  height: 50px;
+}
 }

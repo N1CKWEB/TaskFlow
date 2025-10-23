@@ -164,3 +164,10 @@ select option {
     color: white;
     /* color del texto */
 }
+
+@media (max-width: 1592px) {
+.card {
+    padding: 20px;
+    margin: 20px  auto;
+}
+}
