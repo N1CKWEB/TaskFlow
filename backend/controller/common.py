@@ -2,7 +2,7 @@
 from backend.conection.conexion import get_connection
 
 
-
+#
 def get_or_create_personal_project(user_id):
     """
     Devuelve (id_proyecto, rol_codigo='LIDER') del proyecto personal del usuario.

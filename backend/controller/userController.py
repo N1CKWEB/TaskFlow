@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from backend.conection.conexion import get_connection
 
-
+#
 from .common import get_or_create_personal_project
 
 user_bp = Blueprint('user_bp', __name__)

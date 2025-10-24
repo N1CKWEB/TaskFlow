@@ -5,7 +5,7 @@ from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from conection.conexion import get_connection
 
 
-
+#
 def _role_code(user_id, project_id):
     sql = """
       SELECT r.codigo
