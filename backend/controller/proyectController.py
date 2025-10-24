@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend.conection.conexion import get_connection
 
-#
+
 project_bp = Blueprint('project_bp', __name__)
 
 @project_bp.route('/proyectos', methods=['POST'])

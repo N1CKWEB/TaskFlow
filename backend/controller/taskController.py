@@ -4,7 +4,7 @@ from backend.conection.conexion import get_connection
          # ← 2 en “connection”
 from .common import get_or_create_personal_project, user_is_leader_of_task
 
-#
+
 task_bp = Blueprint('task_bp', __name__)
 
 
