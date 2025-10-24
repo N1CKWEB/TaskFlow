@@ -9,7 +9,7 @@ def crear_usuario(nombre_completo, email, contraseña):
     )
     conn.commit()
     conn.close()
-
+#
 def obtener_usuario(email, contraseña):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
