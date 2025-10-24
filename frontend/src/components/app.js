@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     editBtn.style.display = "none";
   });
 
+  // Actualizar tarea
   saveBtn.addEventListener("click", async () => {
     const nuevoTitulo = modalTitle.value.trim();
     const nuevaDesc = modalDesc.value.trim();
@@ -200,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/tareas/${selectedTask.id}`, {
+      const response = await fetch(`http://localhost:3000/tareas/${selectedTask.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"

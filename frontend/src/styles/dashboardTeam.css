@@ -325,6 +325,7 @@ main.content {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+
 /* Animación suave */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.95); }
@@ -362,8 +363,11 @@ main.content {
   padding: 12px 14px;
   font-size: 14px;
   outline: none;
-  width: 100%;
   transition: all 0.2s ease;
+}
+.input-conditions{
+  width: 90%;
+  margin-top: 10px;
 }
 .input-date::-webkit-calendar-picker-indicator {
   filter: invert(69%) sepia(91%) saturate(500%) hue-rotate(150deg);
@@ -416,7 +420,31 @@ main.content {
 
 /* Botón crear tarea */
 .button-create-task {
-  background-color: rgb(10, 210, 210);
+  background-color: rgb(25, 148, 148);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.button-edit-task {
+  background-color: rgb(14, 113, 92);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.button-delete-task {
+  background-color: rgba(9, 106, 210, 0.781);
   color: #000;
   font-weight: bold;
   border: none;
@@ -439,13 +467,22 @@ main.content {
   transition: 0.3s ease;
 }
 
+.button-create-task:hover {
+  background-color: rgb(14, 240, 240);
+}
+.button-edit-task:hover{
+  background-color: rgb(5, 255, 201);
+}
+
+.button-delete-task:hover {
+  background-color: rgb(0, 128, 255);  
+}
+
 .button-close-task:hover{
   background-color: rgb(255, 0, 0);
   
 }
-.button-create-task:hover {
-  background-color: rgb(14, 240, 240);
-}
+
 
 /* Responsive */
 @media (max-width: 600px) {
@@ -514,7 +551,7 @@ main.content {
 
   /* 🔽 Altura fija + scroll interno */
   height: 360px;              /* podés ajustar según tu diseño */
-  overflow-x: auto;           /* scroll vertical */
+  overflow-y: auto;               /* scroll vertical */
   scrollbar-color: #0ad2d2 #202224;
 }
 
@@ -528,4 +565,168 @@ main.content {
 }
 .template::-webkit-scrollbar-track {
   background-color: #202224;
+}
+
+.button-condition-add {
+  gap: 10px;
+  width: 5%;
+  max-width: 20%;
+  height: 50px;
+  border-radius: 20px;
+  background-color: rgb(25, 27, 27);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin: 0 auto;
+  position: absolute;
+  bottom: 245px;
+  left: 830px;
+}
+.icon-condition{
+  font-size: 23px;
+}
+.subtitle-conditions {
+  color: #e5e5e5;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.delete-dev-btn {
+  border: none;
+  color: #ff5c5c;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: 0.2s;
+}
+
+.delete-dev-btn:hover {
+  color: #ff2e2e;
+}
+
+
+/* === Contenedor scroll de condiciones === */
+.conditions-container {
+  max-height: 150px;              /* 🔽 altura fija visible */
+  overflow-y: auto;               /* scroll vertical */
+  background-color: #101315;      /* mismo color que el form */
+  padding-right: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Scrollbar personalizado */
+.conditions-container::-webkit-scrollbar {
+  width: 6px;
+}
+.conditions-container::-webkit-scrollbar-thumb {
+  background-color: #0ad2d2;
+  border-radius: 6px;
+}
+.conditions-container::-webkit-scrollbar-track {
+  background-color: #202224;
+}
+
+/* Alinear inputs + botón X */
+.member-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* 💻 Escritorio grande (1600px o más) */
+@media (min-width: 1600px) {
+  .card-create-task {
+    background-color: #101315;
+    width: 40%;
+    max-width: 600px;
+    border-radius: 18px;
+    padding: 30px 40px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+/* 🖥️ Monitores medianos (entre 1200 y 1599px) */
+@media (max-width: 1599px) and (min-width: 1200px) {
+  .card-create-task {
+    background-color: #101315;
+    width: 50%;
+    max-width: 520px;
+    border-radius: 18px;
+    padding: 25px 35px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 89x;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+/* 💡 Pantallas pequeñas o laptops chicas (hasta 1199px) */
+@media (max-width: 1199px) {
+  .card-create-task {
+    background-color: #101315;
+    width: 85%;
+    max-width: 480px;
+    border-radius: 18px;
+    padding: 25px 30px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+/* Contenedor del título + botón "+" */
+.subtitle-conditions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  position: relative;
+  bottom: 211px;
+}
+
+/* Título */
+.subtitle-conditions {
+  color: #e5e5e5;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  
+}
+
+/* Botón + */
+.button-condition-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #202224;
+  color: #0ad2d2;
+  border: none;
+  border-radius: 10px;
+  width: 40px;
+  height: 35px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: -0%;
+  margin-left: 110px;
+  position: fixed;
+  gap: 2px;
+}
+
+.button-condition-add:hover {
+  background-color: #303436;
+  transform: scale(1.05);
 }

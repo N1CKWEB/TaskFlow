@@ -9,8 +9,6 @@ from backend.controller.taskController import task_bp
 #from backend.controller.auth_middleware import auth_middleware
 from flask_jwt_extended import JWTManager
 
-from flask import Flask
-from flask_cors import CORS
 
 
 
