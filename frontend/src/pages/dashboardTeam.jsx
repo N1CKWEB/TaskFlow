@@ -25,6 +25,45 @@ export function DashboardTeam() {
   const [condiciones, setCondiciones] = useState([""]);
   const [estado, setEstado] = useState("To-Do");
 
+  // 🕓 Control de horas reales trabajadas
+  const [horaInicio, setHoraInicio] = useState(null);
+  const [horasTrabajadas, setHorasTrabajadas] = useState(0);
+  
+    const [horaInicioEquipo, setHoraInicioEquipo] = useState(null);
+  const [usuarioLogueado, setUsuarioLogueado] = useState(true); // simulado
+
+  // 🟢 Inicia conteo cuando el usuario está logueado y en esta sección
+  useEffect(() => {
+    if (usuarioLogueado && !horaInicioEquipo) {
+      setHoraInicioEquipo(Date.now());
+      console.log("⏱️ Contador iniciado (sección equipo)");
+    }
+
+    return () => {
+      if (horaInicioEquipo) {
+        const fin = Date.now();
+        const horasTotales = (fin - horaInicioEquipo) / (1000 * 60 * 60);
+        setHorasTrabajadas((prev) => prev + horasTotales);
+        setHoraInicioEquipo(null);
+        console.log("🛑 Contador detenido (salió de equipo)");
+      }
+    };
+  }, [usuarioLogueado]);
+
+  // 🔄 Actualización en tiempo real mientras está activo
+  useEffect(() => {
+    let interval;
+    if (horaInicioEquipo) {
+      interval = setInterval(() => {
+        const ahora = Date.now();
+        const horasActuales = (ahora - horaInicioEquipo) / (1000 * 60 * 60);
+        setHorasTrabajadas(horasActuales);
+      }, 60000); // cada minuto
+    }
+    return () => clearInterval(interval);
+  }, [horaInicioEquipo]);
+
+
   // Colores según prioridad
   const getPriorityColor = (p) => {
     switch (p?.toLowerCase()) {
@@ -69,10 +108,41 @@ export function DashboardTeam() {
       setPrioridad(tareaSeleccionada.prioridad);
       setFechaEntrega(tareaSeleccionada.fechaEntrega);
       setHoras(tareaSeleccionada.horas);
-      setCondiciones([tareaSeleccionada.condiciones]);
-      setEstado(tareaSeleccionada.status);
+      setCondiciones(
+        Array.isArray(tareaSeleccionada.condiciones)
+          ? tareaSeleccionada.condiciones
+          : tareaSeleccionada.condiciones
+        .split(',')
+        .map((c) => c.trim())
+);
+
+      // 🕒 Iniciar conteo en tiempo real cuando se abre la tarea
+      setHoraInicio(Date.now());
     }
+
+    // 🧹 Cuando se cambia o cierra la tarea, registrar el tiempo trabajado
+    return () => {
+      if (horaInicio) {
+        const fin = Date.now();
+        const horasTotales = (fin - horaInicio) / (1000 * 60 * 60);
+        setHorasTrabajadas((prev) => prev + horasTotales);
+        setHoraInicio(null);
+      }
+    };
   }, [tareaSeleccionada]);
+
+  // 🕑 Actualizar contador visible en tiempo real
+  useEffect(() => {
+    let interval;
+    if (horaInicio) {
+      interval = setInterval(() => {
+        const ahora = Date.now();
+        const horasActuales = (ahora - horaInicio) / (1000 * 60 * 60);
+        setHorasTrabajadas(horasActuales);
+      }, 1); 
+    }
+    return () => clearInterval(interval);
+  }, [horaInicio]);
 
   // === Editar tarea existente ===
   const handleEditarTarea = () => {
@@ -94,6 +164,14 @@ export function DashboardTeam() {
 
   // === Cerrar y limpiar formulario ===
   const handleCerrarForm = () => {
+    // ⏹️ Guardar tiempo trabajado si se cierra el form
+    if (horaInicio) {
+      const fin = Date.now();
+      const horasTotales = (fin - horaInicio) / (1000 * 60 * 60);
+      setHorasTrabajadas((prev) => prev + horasTotales);
+      setHoraInicio(null);
+    }
+
     setShowForm(false);
     setTareaSeleccionada(null);
     setNombre("");
@@ -104,11 +182,9 @@ export function DashboardTeam() {
     setCondiciones([""]);
   };
 
-  
   const handleAgregarCondiciones = () => {
     setCondiciones([...condiciones, ""]);
   };
-
 
   // === Drag & Drop ===
   const handleDragStart = (e, id) => {
@@ -241,7 +317,6 @@ export function DashboardTeam() {
         {/* === FORMULARIO === */}
         {showForm && (
           <div className="overlay">
-
             <div className="card-create-task">
               <h2 className="title-create-task">
                 {tareaSeleccionada ? "Editar tarea" : "Crear nueva tarea"}
@@ -253,20 +328,20 @@ export function DashboardTeam() {
                 placeholder="Nombre de la tarea"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                />
+              />
 
               <textarea
                 className="textarea-task"
                 placeholder="Descripción de la tarea"
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                />
+              />
 
               <select
                 className="select-priority"
                 value={prioridad}
                 onChange={(e) => setPrioridad(e.target.value)}
-                >
+              >
                 <option disabled value="">
                   Prioridad
                 </option>
@@ -275,59 +350,78 @@ export function DashboardTeam() {
                 <option value="Baja">🕓 Baja</option>
               </select>
 
-
               <input
                 type="date"
                 className="input-date"
                 value={fechaEntrega}
                 onChange={(e) => setFechaEntrega(e.target.value)}
-                />
+  
+              />
 
               <input
                 type="number"
                 className="input-hours"
                 placeholder="Horas programadas"
                 value={horas}
-                onChange={(e) => setHoras(e.target.value)}
-                />
-
+                min={1}
+                step={1}
+                onChange={(e) => {
+                const valor = parseInt(e.target.value, 10);
+                if (isNaN(valor) || valor < 1) {
+                  setHoras(1);
+                } else {
+                  setHoras(valor);
+                }
+              }}
+              onBlur={() => {
+                if (horas < 1) setHoras(1);
+              }}
+              required
+              />
 
               {/* === Condiciones de aceptación === */}
-            <h3 className="subtitle-conditions">Condiciones de aceptación</h3>
+              <h3 className="subtitle-conditions">Condiciones de aceptación</h3>
 
-            <div className="conditions-container">
-              {condiciones.map((cond, index) => (
-                <div key={index} className="member-input fadeIn">
-                  <input
-                    type="text"
-                    className="input-conditions"
-                    placeholder={`Condición ${index + 1}`}
-                    value={cond}
-                    onChange={(e) => {
-                      const nuevas = [...condiciones];
-                      nuevas[index] = e.target.value;
-                      setCondiciones(nuevas);
-                    }}
+              <div className="conditions-container">
+                {condiciones.map((cond, index) => (
+                  <div key={index} className="member-input fadeIn">
+                    <input
+                      type="text"
+                      className="input-conditions"
+                      placeholder={`Condición ${index + 1}`}
+                      value={cond}
+                      onChange={(e) => {
+                        const nuevas = [...condiciones];
+                        nuevas[index] = e.target.value;
+                        setCondiciones(nuevas);
+                      }}
                     />
-                  {condiciones.length > 1 && (
-                    <button
-                    type="button"
-                    className="delete-dev-btn"
-                    onClick={() => {
-                      const nuevas = condiciones.filter((_, i) => i !== index);
-                      setCondiciones(nuevas);
-                    }}
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ))}
+                    {condiciones.length > 1 && (
+                      <button
+                        type="button"
+                        className="delete-dev-btn"
+                        onClick={() => {
+                          const nuevas = condiciones.filter((_, i) => i !== index);
+                          setCondiciones(nuevas);
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
+                ))}
+              </div>
 
-         
+              {/* === Horas trabajadas en tiempo real === */}
+              <div className="horas-reales-container">
+                <p style={{ color: "#e5e5e5", marginBottom: "8px" }}>
+                  ⏱️ Horas programadas: <strong>{horas || 0}</strong> h
+                </p>
+                <p style={{ color: "#00ff88" }}>
+                  🔄 Horas en tiempo real: <strong>{horasTrabajadas.toFixed(2)}</strong> h
+                </p>
+              </div>
 
-            
               {tareaSeleccionada ? (
                 <>
                   <button onClick={handleEditarTarea} className="button-edit-task">
@@ -339,22 +433,19 @@ export function DashboardTeam() {
                 </>
               ) : (
                 <>
-                <button  type="button" onClick={() => setCondiciones([...condiciones, ""])} className='button-condition-add'>
-                <span className='title-user-add'>+</span>
-                </button>
 
-                <button onClick={handleCrearTareaFinal} className="button-create-task">
-                  Crear tarea
-                </button>
-                
-                
+                  <button  onClick={() => setCondiciones([...condiciones, ""])} className="button-add-condition-task">
+                    <span className="title-user-add">+ Agregar otra condición</span>
+                  </button>
+
+                  <button onClick={handleCrearTareaFinal} className="button-create-task">
+                    Crear tarea
+                  </button>
                 </>
-         
               )}
               <button onClick={handleCerrarForm} className="button-close-task">
                 Cerrar
               </button>
-
             </div>
           </div>
         )}
