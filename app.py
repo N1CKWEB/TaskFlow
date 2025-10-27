@@ -1,42 +1,52 @@
-from flask import Flask
+# app.py
+from datetime import timedelta
+from flask import Flask, jsonify
 from flask_cors import CORS
-
-# Agregá el prefijo 'backend.' porque app.py está en la raíz del proyecto
-from backend.controller.userController import user_bp
-from backend.controller.taskController import task_bp
-# (si tenés más blueprints, también con “backend.controller”)
-#from backend.controller.proyectController import proyect_bp
-#from backend.controller.auth_middleware import auth_middleware
 from flask_jwt_extended import JWTManager
 
-from flask import Flask
-from flask_cors import CORS
-
-
+# IMPORTA TUS BLUEPRINTS
+from backend.controller.userController import user_bp
+from backend.controller.taskController import task_bp
+from backend.controller.proyectController import project_bp  as proyect_bp
 
 app = Flask(__name__)
-CORS(app)
 
+# --- Config JWT ---
+app.config["JWT_SECRET_KEY"] = "cambia-esto-por-una-clave-larga-y-secreta"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+# Opcional:
+app.config["JSON_AS_ASCII"] = False
+
+# --- Inicializaciones ---
+jwt = JWTManager(app)          # <<<< INICIALIZA JWT
+CORS(app, supports_credentials=True,
+     origins=[
+       "http://127.0.0.1:5173", "http://localhost:5173",
+       "http://127.0.0.1:3000", "http://localhost:3000"
+     ])
+
+# --- Blueprints ---
 app.register_blueprint(user_bp)
 app.register_blueprint(task_bp)
+app.register_blueprint(proyect_bp)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# --- Rutas utiles / health ---
+@app.get("/")
+def ok():
+    return jsonify(ok=True)
 
-app = Flask(__name__)
-CORS(app)
+# --- Handlers JWT (opcionales pero útiles) ---
+@jwt.unauthorized_loader
+def jwt_unauth(err):
+    return jsonify(error="Falta header Authorization Bearer"), 401
 
-# Clave para JWT (en prod, usar variable de entorno)
-app.config["JWT_SECRET_KEY"] = "dev-secret-change-me"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 60 * 60 * 6  # 6 hs
+@jwt.invalid_token_loader
+def jwt_invalid(err):
+    return jsonify(error="Token inválido"), 401
 
-jwt = JWTManager(app)
+@jwt.expired_token_loader
+def jwt_expired(jwt_header, jwt_data):
+    return jsonify(error="Token expirado"), 401
 
-# Blueprints
-app.register_blueprint(user_bp, url_prefix="/api")
-app.register_blueprint(project_bp, url_prefix="/api")
-app.register_blueprint(task_bp, url_prefix="/api")
-
-@app.route('/')
-def home():
-    return "✅ Servidor Flask corriendo correctamente - TaskFlow Backend"
+if __name__ == "__main__":
+    app.run(debug=True, host="127.0.0.1", port=5000)
