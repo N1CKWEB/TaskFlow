@@ -637,16 +637,25 @@ a:hover {
   transform: scale(1.1);
 }
 
-/* Mover contenido cuando se abre la barra */
+/* Apertura rápida */
 .layout.sidebar-open .content {
   transform: translateX(200px);
-  transition: transform 0.4s ease;
+  transition: transform 0.8s ease-out;
+  /* rápido al abrir */
 }
+
+/* Cierre lento */
+.layout .content {
+  transform: translateX(0);
+  transition: transform 0.35s ease-in;
+  /* lento al cerrar */
+}
+
 
 .sidebar.open+.hamburger-btn,
 .sidebar.open~.hamburger-btn {
   left: 270px !important;
-  transition: left 0.4s ease;
+  transition: left 0.35s ease;
   top: 6px;
 }
 
