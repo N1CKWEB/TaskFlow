@@ -3,39 +3,66 @@ import "../styles/login.css";
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState("login");
-  const [formData, setFormData] = useState({
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [registerData, setRegisterData] = useState({
     username: "",
     email: "",
     password: "",
     confirm: "",
-    userType: "dueño", // valor por defecto
+    userType: "dueño",
   });
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
+  const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegisterChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
+
     if (activeTab === "login") {
-      if (!formData.email || !formData.password) {
+      if (!loginData.email || !loginData.password) {
         setError("Completa todos los campos");
         return;
       }
-      console.log("Login:", { email: formData.email, password: formData.password });
+      console.log("Login:", loginData);
+      // Aquí iría tu petición al backend para login
     } else {
-      if (!formData.username || !formData.email || !formData.password || !formData.confirm || !formData.userType) {
+      const { username, email, password, confirm, userType } = registerData;
+      if (!username || !email || !password || !confirm || !userType) {
         setError("Completa todos los campos");
         return;
       }
-      if (formData.password !== formData.confirm) {
+      if (password !== confirm) {
         setError("Las contraseñas no coinciden");
         return;
       }
-      console.log("Register:", formData);
+      console.log("Register:", registerData);
+      // Aquí iría tu petición al backend para registro
+    }
+  };
+
+  const handleTabSwitch = (tab) => {
+    setError("");
+    setActiveTab(tab);
+    // Limpiamos el formulario de la pestaña activa
+    if (tab === "login") {
+      setLoginData({ email: "", password: "" });
+    } else {
+      setRegisterData({
+        username: "",
+        email: "",
+        password: "",
+        confirm: "",
+        userType: "dueño",
+      });
     }
   };
 
@@ -46,13 +73,13 @@ export default function Login() {
         <div className="tabs">
           <button
             className={activeTab === "login" ? "active" : ""}
-            onClick={() => setActiveTab("login")}
+            onClick={() => handleTabSwitch("login")}
           >
             Iniciar Sesión
           </button>
           <button
             className={activeTab === "register" ? "active" : ""}
-            onClick={() => setActiveTab("register")}
+            onClick={() => handleTabSwitch("register")}
           >
             Crear Cuenta
           </button>
@@ -70,8 +97,8 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={loginData.email}
+                  onChange={handleLoginChange}
                   placeholder="tu@email.com"
                 />
               </div>
@@ -80,8 +107,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={loginData.password}
+                  onChange={handleLoginChange}
                   placeholder="••••••••"
                 />
               </div>
@@ -101,8 +128,8 @@ export default function Login() {
                 <input
                   type="text"
                   name="username"
-                  value={formData.username}
-                  onChange={handleChange}
+                  value={registerData.username}
+                  onChange={handleRegisterChange}
                   placeholder="Nombre completo"
                 />
               </div>
@@ -111,8 +138,8 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={registerData.email}
+                  onChange={handleRegisterChange}
                   placeholder="tu@email.com"
                 />
               </div>
@@ -121,8 +148,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={registerData.password}
+                  onChange={handleRegisterChange}
                   placeholder="••••••••"
                 />
               </div>
@@ -131,8 +158,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="confirm"
-                  value={formData.confirm}
-                  onChange={handleChange}
+                  value={registerData.confirm}
+                  onChange={handleRegisterChange}
                   placeholder="••••••••"
                 />
               </div>
@@ -140,8 +167,8 @@ export default function Login() {
                 <label>Tipo de Usuario</label>
                 <select
                   name="userType"
-                  value={formData.userType}
-                  onChange={handleChange}
+                  value={registerData.userType}
+                  onChange={handleRegisterChange}
                 >
                   <option value="dueño">Dueño</option>
                   <option value="lider">Líder</option>
