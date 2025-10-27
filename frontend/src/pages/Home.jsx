@@ -3,21 +3,24 @@ import React, { useState } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import { GoProjectSymlink } from 'react-icons/go';
+import { FaTimes } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
 import userImg from '../assets/img/img-logo-perfil-user-new.png';
 import { RiUserStarFill } from "react-icons/ri";
 import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
-import { GoProjectSymlink } from 'react-icons/go';
-import { FaTimes } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
 export function Home() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [animando, setAnimando] = useState(false);
+  const [sidebarAbierta, setSidebarAbierta] = useState(false);
   const [proyectos, setProyectos] = useState([]);
   const [nuevoProyecto, setNuevoProyecto] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
 
   const handleCrearProyecto = () => {
     setMostrarFormulario(true);
@@ -71,9 +74,12 @@ export function Home() {
     handleCerrarFormulario();
   };
 
+  const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
+
   return (
-    <div className="layout">
-      <aside className="sidebar">
+    <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
+      {/* === SIDEBAR DESLIZANTE === */}
+      <aside className={`sidebar ${sidebarAbierta ? 'open' : ''}`}>
         <h2 className="sidebar-title">TaskFlow</h2>
         <hr className='sidebar-line' />
         <nav className="menu">
@@ -87,7 +93,7 @@ export function Home() {
             <AiOutlineTeam className='icons' />
           </Link>
 
-          <Link to='/settings'>
+          <Link to='/settings' className='menu-link'>
             Ajustes
             <IoSettings className='icons' />
           </Link>
@@ -99,7 +105,7 @@ export function Home() {
             <span>Cerrar Sesión</span>
           </button>
           <div className="user-info">
-            <img src={userImg} className="user-avatar" />
+            <img src={userImg} className="user-avatar" alt="Usuario" />
             <div className="user-texts">
               <p className="title-user-box">Nombre Usuario</p>
               <p className="subtitle-user-box">Líder de Proyecto</p>
@@ -107,7 +113,15 @@ export function Home() {
           </div>
         </div>
       </aside>
+      {/* === BOTÓN HAMBURGUESA === */}
+      <button
+        className="hamburger-btn"
+        onClick={() => setSidebarAbierta(!sidebarAbierta)}
+      >
+        {sidebarAbierta ? <FaTimes /> : <GiHamburgerMenu />}
+      </button>
 
+      {/* === CONTENIDO PRINCIPAL === */}
       <main className="content">
         <h1 className="title">Hola Nicolás</h1>
         <p className="subtitle">¡Bienvenido de nuevo al espacio de trabajo, te extrañamos!</p>
@@ -121,7 +135,7 @@ export function Home() {
         <h3 className='title-actions'>Proyectos</h3>
 
         <div className="project-grid">
-          {proyectos.map(proyecto => (
+          {proyectosVisibles.map(proyecto => (
             <div
               key={proyecto.id}
               className="project-card"
@@ -131,6 +145,17 @@ export function Home() {
               <p className="project-name">{proyecto.nombre}</p>
             </div>
           ))}
+
+          {proyectos.length > 5 && (
+            <div
+              className="project-card ver-mas"
+              onClick={() => setMostrarTodos(!mostrarTodos)}
+            >
+              <p className="project-name">
+                {mostrarTodos ? "Ver menos proyectos..." : "Ver más proyectos..."}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="actions">
