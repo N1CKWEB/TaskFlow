@@ -1,5 +1,5 @@
 import '../../src/styles/Home.css';
-import React, { use, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
@@ -10,21 +10,73 @@ import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { GoProjectSymlink } from 'react-icons/go';
 import { FaTimes } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function Home() {
+  const navigate = useNavigate();
+  
+  // 🔐 Obtener datos del usuario logueado
+  const [usuario, setUsuario] = useState({
+    id: null,
+    nombre: "",
+    rol_id: null,
+    rol_codigo: ""
+  });
+
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [animando, setAnimando] = useState(false);
   const [proyectos, setProyectos] = useState([]);
   const [nuevoProyecto, setNuevoProyecto] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
 
+  // 🔄 Cargar datos del usuario al montar el componente
+  useEffect(() => {
+    const usuarioData = {
+      id: localStorage.getItem("usuario_id"),
+      nombre: localStorage.getItem("nombre_usuario") || "Usuario",
+      rol_id: parseInt(localStorage.getItem("rol_id")),
+      rol_codigo: localStorage.getItem("rol_codigo") || ""
+    };
+    setUsuario(usuarioData);
+  }, []);
+
+  // ✅ Verificar si puede crear proyectos (Dueño o Líder)
+  const puedeCrearProyectos = () => {
+    return usuario.rol_id === 1 || usuario.rol_id === 2;
+  };
+
+  // 🚪 Cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("nombre_usuario");
+    localStorage.removeItem("rol_id");
+    localStorage.removeItem("rol_codigo");
+    navigate("/login");
+  };
+
+  // 📋 Obtener nombre del rol en español
+  const obtenerNombreRol = () => {
+    switch(usuario.rol_id) {
+      case 1:
+        return "Dueño del Proyecto";
+      case 2:
+        return "Líder de Proyecto";
+      case 3:
+        return "Desarrollador";
+      default:
+        return "Usuario";
+    }
+  };
+
   const handleCrearProyecto = () => {
+    if (!puedeCrearProyectos()) {
+      alert("No tienes permisos para crear proyectos");
+      return;
+    }
     setMostrarFormulario(true);
     setAnimando("opening");
   };
-
-
 
   const handleCerrarFormulario = () => {
     setAnimando("closing");
@@ -48,7 +100,10 @@ export function Home() {
   };
 
   const handleCrearProyectoFinal = () => {
-    if (nuevoProyecto.trim() === "") return;
+    if (nuevoProyecto.trim() === "") {
+      alert("Por favor ingresa un nombre para el proyecto");
+      return;
+    }
 
     const siglas = nuevoProyecto
       .split(" ")
@@ -58,7 +113,6 @@ export function Home() {
 
     const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
     const colorRandom = colores[Math.floor(Math.random() * colores.length)];
-    
     
     const nuevo = {
       id: Date.now(),
@@ -90,29 +144,29 @@ export function Home() {
             <AiOutlineTeam className='icons' />
           </Link>
 
-          <Link to='/settings'>
+          <Link to='/settings' className='menu-link'>
             Ajustes
             <IoSettings className='icons' />
           </Link>
         </nav>
 
         <div className="user-box">
-          <button className="logout-button">
+          <button className="logout-button" onClick={handleLogout}>
             <RiLogoutBoxRLine className='icon-logout' />
             <span>Cerrar Sesión</span>
           </button>
           <div className="user-info">
-            <img src={userImg} className="user-avatar" />
+            <img src={userImg} className="user-avatar" alt="Avatar" />
             <div className="user-texts">
-              <p className="title-user-box">Nombre Usuario</p>
-              <p className="subtitle-user-box">Líder de Proyecto</p>
+              <p className="title-user-box">{usuario.nombre}</p>
+              <p className="subtitle-user-box">{obtenerNombreRol()}</p>
             </div>
           </div>
         </div>
       </aside>
 
       <main className="content">
-        <h1 className="title">Hola Nicolás</h1>
+        <h1 className="title">Hola {usuario.nombre}</h1>
         <p className="subtitle">¡Bienvenido de nuevo al espacio de trabajo, te extrañamos!</p>
 
         <input
@@ -139,13 +193,33 @@ export function Home() {
         <div className="actions">
           {!mostrarFormulario && (
             <>
-              <button onClick={handleCrearProyecto} className="new-btn">+ Nuevo Proyecto</button>
-              <button className="import-btn">Importar Proyecto</button>
+              {/* ✅ Solo Dueño (1) y Líder (2) pueden crear proyectos */}
+              {puedeCrearProyectos() ? (
+                <>
+                  <button onClick={handleCrearProyecto} className="new-btn">
+                    + Nuevo Proyecto
+                  </button>
+                  <button className="import-btn">Importar Proyecto</button>
+                </>
+              ) : (
+                <div style={{ 
+                  padding: '20px', 
+                  textAlign: 'center', 
+                  color: '#888',
+                  fontStyle: 'italic' 
+                }}>
+                  <p>⚠️ No tienes permisos para crear proyectos.</p>
+                  <p style={{ fontSize: '14px', marginTop: '8px' }}>
+                    Solo los Dueños y Líderes pueden crear proyectos.
+                  </p>
+                </div>
+              )}
             </>
           )}
         </div>
 
-        {mostrarFormulario && (
+        {/* ✅ Solo mostrar formulario si tiene permisos */}
+        {mostrarFormulario && puedeCrearProyectos() && (
           <div className={`card-new-project ${animando}`}>
             <h2 className='title-new-project'>Título del Proyecto</h2>
             <input

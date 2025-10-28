@@ -26,60 +26,59 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  try {
-    if (activeTab === "login") {
-      // ------------------ LOGIN ------------------
-      if (!formData.email || !formData.password) {
-        setError("Completa todos los campos");
-        return;
+    try {
+      if (activeTab === "login") {
+        // ------------------ LOGIN ------------------
+        if (!formData.email || !formData.password) {
+          setError("Completa todos los campos");
+          return;
+        }
+
+        const user = await apiLogin(formData.email, formData.password);
+
+        // ✅ CRÍTICO: Guardar token y datos del usuario
+        localStorage.setItem("usuario_id", user.id_usuario);
+        localStorage.setItem("nombre_usuario", user.nombre_completo);
+        localStorage.setItem("token", user.token || "authenticated"); // ← ESTO FALTABA
+
+        alert(`Bienvenido, ${user.nombre_completo}`);
+
+        // Redirigir a la página principal
+        navigate("/");
+
+      } else {
+        // ------------------ REGISTRO ------------------
+        if (!formData.username || !formData.email || !formData.password || !formData.confirm) {
+          setError("Completa todos los campos");
+          return;
+        }
+
+        if (formData.password !== formData.confirm) {
+          setError("Las contraseñas no coinciden");
+          return;
+        }
+
+        const nuevoUsuario = {
+          nombre_completo: formData.username,
+          email: formData.email,
+          contraseña: formData.password,
+          confirmar_contraseña: formData.confirm,
+          id_rol: rolesMap[formData.userType],
+        };
+
+        await apiRegister(nuevoUsuario);
+        alert("Usuario registrado correctamente. Ahora podés iniciar sesión.");
+        setActiveTab("login");
       }
-
-      const response = await apiLogin(formData.email, formData.password);
-
-      // ✅ Acceder correctamente a los datos
-      const { access_token, usuario } = response;
-
-      // ✅ Guardar token y datos del usuario
-      localStorage.setItem("usuario_id", usuario.id_usuario);
-      localStorage.setItem("nombre_usuario", usuario.nombre_completo);
-      localStorage.setItem("token", access_token); // ← El token real del backend
-
-      alert(`Bienvenido, ${usuario.nombre_completo}`);
-      navigate("/");
-
-    } else {
-      // ------------------ REGISTRO ------------------
-      if (!formData.username || !formData.email || !formData.password || !formData.confirm) {
-        setError("Completa todos los campos");
-        return;
-      }
-
-      if (formData.password !== formData.confirm) {
-        setError("Las contraseñas no coinciden");
-        return;
-      }
-
-      const nuevoUsuario = {
-        nombre_completo: formData.username,
-        email: formData.email,
-        contraseña: formData.password,
-        confirmar_contraseña: formData.confirm,
-        id_rol: rolesMap[formData.userType],
-      };
-
-      await apiRegister(nuevoUsuario);
-      alert("Usuario registrado correctamente. Ahora podés iniciar sesión.");
-      setActiveTab("login");
+    } catch (err) {
+      console.error(err);
+      setError(err?.mensaje || err?.error || "Error en la conexión con el servidor");
     }
-  } catch (err) {
-    console.error(err);
-    setError(err?.mensaje || err?.error || "Error en la conexión con el servidor");
-  }
-};
+  };
 
   return (
     <div className="login-container">
