@@ -1,10 +1,17 @@
 import { useState } from "react";
 import "../styles/login.css";
+import { apiLogin, apiRegister } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const rolesMap = {
+    dueño: 1,
+    lider: 2,
+    desarrollador: 3,
+  };
+
   const [activeTab, setActiveTab] = useState("login");
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [registerData, setRegisterData] = useState({
+  const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
@@ -12,81 +19,90 @@ export default function Login() {
     userType: "dueño",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLoginChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setLoginData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRegisterChange = (e) => {
-    const { name, value } = e.target;
-    setRegisterData((prev) => ({ ...prev, [name]: value }));
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
-
+  try {
     if (activeTab === "login") {
-      if (!loginData.email || !loginData.password) {
+      // ------------------ LOGIN ------------------
+      if (!formData.email || !formData.password) {
         setError("Completa todos los campos");
         return;
       }
-      console.log("Login:", loginData);
-      // Aquí iría tu petición al backend para login
+
+      const response = await apiLogin(formData.email, formData.password);
+
+      // ✅ Acceder correctamente a los datos
+      const { access_token, usuario } = response;
+
+      // ✅ Guardar token y datos del usuario
+      localStorage.setItem("usuario_id", usuario.id_usuario);
+      localStorage.setItem("nombre_usuario", usuario.nombre_completo);
+      localStorage.setItem("token", access_token); // ← El token real del backend
+
+      alert(`Bienvenido, ${usuario.nombre_completo}`);
+      navigate("/");
+
     } else {
-      const { username, email, password, confirm, userType } = registerData;
-      if (!username || !email || !password || !confirm || !userType) {
+      // ------------------ REGISTRO ------------------
+      if (!formData.username || !formData.email || !formData.password || !formData.confirm) {
         setError("Completa todos los campos");
         return;
       }
-      if (password !== confirm) {
+
+      if (formData.password !== formData.confirm) {
         setError("Las contraseñas no coinciden");
         return;
       }
-      console.log("Register:", registerData);
-      // Aquí iría tu petición al backend para registro
-    }
-  };
 
-  const handleTabSwitch = (tab) => {
-    setError("");
-    setActiveTab(tab);
-    // Limpiamos el formulario de la pestaña activa
-    if (tab === "login") {
-      setLoginData({ email: "", password: "" });
-    } else {
-      setRegisterData({
-        username: "",
-        email: "",
-        password: "",
-        confirm: "",
-        userType: "dueño",
-      });
+      const nuevoUsuario = {
+        nombre_completo: formData.username,
+        email: formData.email,
+        contraseña: formData.password,
+        confirmar_contraseña: formData.confirm,
+        id_rol: rolesMap[formData.userType],
+      };
+
+      await apiRegister(nuevoUsuario);
+      alert("Usuario registrado correctamente. Ahora podés iniciar sesión.");
+      setActiveTab("login");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError(err?.mensaje || err?.error || "Error en la conexión con el servidor");
+  }
+};
 
   return (
     <div className="login-container">
       <div className="card">
         <h1>Bienvenido</h1>
+
         <div className="tabs">
           <button
             className={activeTab === "login" ? "active" : ""}
-            onClick={() => handleTabSwitch("login")}
+            onClick={() => setActiveTab("login")}
           >
             Iniciar Sesión
           </button>
           <button
             className={activeTab === "register" ? "active" : ""}
-            onClick={() => handleTabSwitch("register")}
+            onClick={() => setActiveTab("register")}
           >
             Crear Cuenta
           </button>
         </div>
 
         <div className="forms-wrapper">
-          {/* Login */}
+          {/* LOGIN */}
           <form
             className={`form-container login-form ${activeTab === "login" ? "active" : ""}`}
             onSubmit={handleSubmit}
@@ -97,8 +113,8 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  value={loginData.email}
-                  onChange={handleLoginChange}
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="tu@email.com"
                 />
               </div>
@@ -107,17 +123,19 @@ export default function Login() {
                 <input
                   type="password"
                   name="password"
-                  value={loginData.password}
-                  onChange={handleLoginChange}
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                 />
               </div>
               {error && <div className="error">{error}</div>}
-              <button type="submit" className="submit-btn">Iniciar Sesión</button>
+              <button type="submit" className="submit-btn">
+                Iniciar Sesión
+              </button>
             </div>
           </form>
 
-          {/* Registro */}
+          {/* REGISTRO */}
           <form
             className={`form-container register-form ${activeTab === "register" ? "active" : ""}`}
             onSubmit={handleSubmit}
@@ -128,8 +146,8 @@ export default function Login() {
                 <input
                   type="text"
                   name="username"
-                  value={registerData.username}
-                  onChange={handleRegisterChange}
+                  value={formData.username}
+                  onChange={handleChange}
                   placeholder="Nombre completo"
                 />
               </div>
@@ -138,8 +156,8 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  value={registerData.email}
-                  onChange={handleRegisterChange}
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="tu@email.com"
                 />
               </div>
@@ -148,8 +166,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="password"
-                  value={registerData.password}
-                  onChange={handleRegisterChange}
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                 />
               </div>
@@ -158,8 +176,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="confirm"
-                  value={registerData.confirm}
-                  onChange={handleRegisterChange}
+                  value={formData.confirm}
+                  onChange={handleChange}
                   placeholder="••••••••"
                 />
               </div>
@@ -167,8 +185,8 @@ export default function Login() {
                 <label>Tipo de Usuario</label>
                 <select
                   name="userType"
-                  value={registerData.userType}
-                  onChange={handleRegisterChange}
+                  value={formData.userType}
+                  onChange={handleChange}
                 >
                   <option value="dueño">Dueño</option>
                   <option value="lider">Líder</option>
@@ -176,7 +194,9 @@ export default function Login() {
                 </select>
               </div>
               {error && <div className="error">{error}</div>}
-              <button type="submit" className="submit-btn">Crear Cuenta</button>
+              <button type="submit" className="submit-btn">
+                Crear Cuenta
+              </button>
             </div>
           </form>
         </div>

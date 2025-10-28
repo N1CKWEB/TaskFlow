@@ -1,12 +1,11 @@
+# backend/controller/taskController.py
 from flask import Blueprint, request, jsonify
-from backend.conection.conexion import get_connection
-
-         # ← 2 en “connection”
+from ..conection.conexion import get_connection
 from .common import get_or_create_personal_project, user_is_leader_of_task
-
 
 task_bp = Blueprint('task_bp', __name__)
 
+# ================== RUTAS LEGACY (compatibles con el front actual) ==================
 
 @task_bp.route('/tareas', methods=['POST'])
 def nueva_tarea_legacy():
@@ -15,19 +14,19 @@ def nueva_tarea_legacy():
     Crea la tarea en el PROYECTO PERSONAL del id_usuario.
     """
     data = request.get_json() or {}
-    needed = ['nombre','descripcion','prioridad','tiempo_estimado','id_usuario']
+    needed = ['nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 'id_usuario']
     if not all(k in data for k in needed):
         return jsonify({"error": "Faltan datos obligatorios"}), 400
 
     # proyecto personal (usuario es LIDER)
-    project_id, _ = get_or_create_personal_project(data['id_usuario'])
+    project_id, _ = get_or_create_personal_project(int(data['id_usuario']))
 
     conn = get_connection()
     cur = conn.cursor()
     try:
         cur.execute("""
           INSERT INTO tareas (nombre, descripcion, prioridad, tiempo_estimado, id_usuario, id_proyecto)
-          VALUES (%s,%s,%s,%s,%s,%s)
+          VALUES (%s, %s, %s, %s, %s, %s)
         """, (data['nombre'], data['descripcion'], data['prioridad'],
               data['tiempo_estimado'], data['id_usuario'], project_id))
         conn.commit()
@@ -40,25 +39,30 @@ def nueva_tarea_legacy():
 
 
 @task_bp.route('/tareas/<int:id_usuario>', methods=['GET'])
-def listar_tareas_legacy(id_usuario):
+def listar_tareas_legacy(id_usuario: int):
     """
     V1: lista tareas por id_usuario.
     Ahora listamos las del PROYECTO PERSONAL de ese usuario.
+    Filtro opcional: ?estado=PENDIENTE|EN_PROGRESO|HECHA
     """
     project_id, _ = get_or_create_personal_project(id_usuario)
+    estado = request.args.get('estado')
 
-    estado = request.args.get('estado')  # opcional
     conn = get_connection()
     cur = conn.cursor(dictionary=True)
     try:
         if estado:
-            cur.execute("""SELECT * FROM tareas
-                           WHERE id_proyecto=%s AND estado=%s
-                           ORDER BY fecha_creacion DESC""", (project_id, estado))
+            cur.execute("""
+              SELECT * FROM tareas
+               WHERE id_proyecto=%s AND estado=%s
+               ORDER BY fecha_creacion DESC
+            """, (project_id, estado))
         else:
-            cur.execute("""SELECT * FROM tareas
-                           WHERE id_proyecto=%s
-                           ORDER BY fecha_creacion DESC""", (project_id,))
+            cur.execute("""
+              SELECT * FROM tareas
+               WHERE id_proyecto=%s
+               ORDER BY fecha_creacion DESC
+            """, (project_id,))
         rows = cur.fetchall()
         return jsonify(rows), 200
     finally:
@@ -66,18 +70,17 @@ def listar_tareas_legacy(id_usuario):
 
 
 @task_bp.route('/tareas/<int:id_tarea>', methods=['PUT'])
-def actualizar_tarea_legacy(id_tarea):
+def actualizar_tarea_legacy(id_tarea: int):
     """
-    V1: actualiza pasando todos los campos y id_usuario en el body.
-    Permitimos update solo si el usuario es LIDER del proyecto de la tarea.
+    V1: actualiza pasando todos los campos + id_usuario en el body.
+    Permite update solo si id_usuario es LÍDER del proyecto de la tarea.
     """
     data = request.get_json() or {}
-    needed = ['nombre','descripcion','prioridad','tiempo_estimado','id_usuario']
+    needed = ['nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 'id_usuario']
     if not all(k in data for k in needed):
         return jsonify({"error": "Faltan campos para actualizar la tarea"}), 400
 
-    # check permiso (LIDER del proyecto al que pertenece la tarea)
-    if not user_is_leader_of_task(data['id_usuario'], id_tarea):
+    if not user_is_leader_of_task(int(data['id_usuario']), id_tarea):
         return jsonify({"error": "Permiso denegado"}), 403
 
     conn = get_connection()
@@ -85,9 +88,13 @@ def actualizar_tarea_legacy(id_tarea):
     try:
         cur.execute("""
             UPDATE tareas
-               SET nombre=%s, descripcion=%s, prioridad=%s, tiempo_estimado=%s
+               SET nombre=%s,
+                   descripcion=%s,
+                   prioridad=%s,
+                   tiempo_estimado=%s
              WHERE id_tarea=%s
-        """, (data['nombre'], data['descripcion'], data['prioridad'], data['tiempo_estimado'], id_tarea))
+        """, (data['nombre'], data['descripcion'], data['prioridad'],
+              data['tiempo_estimado'], id_tarea))
         conn.commit()
         return jsonify({"mensaje": "Tarea actualizada"}), 200
     except Exception as e:
@@ -95,19 +102,19 @@ def actualizar_tarea_legacy(id_tarea):
         return jsonify({"error": str(e)}), 500
     finally:
         cur.close(); conn.close()
+
+        
 @task_bp.route('/tareas/<int:id_tarea>', methods=['DELETE'])
-def eliminar_tarea_legacy(id_tarea):
+def eliminar_tarea_legacy(id_tarea: int):
     """
-    V1: elimina tarea por id_tarea y id_usuario en el body.
-    Permitimos delete solo si el usuario es LIDER del proyecto de la tarea.
+    V1: elimina tarea si id_usuario (body) es LÍDER del proyecto de la tarea.
     """
     data = request.get_json() or {}
     id_usuario = data.get('id_usuario')
     if not id_usuario:
-        return jsonify({"error": "Falta id_usuario"}), 400
+        return jsonify({"error": "id_usuario es requerido"}), 400
 
-    # check permiso (LIDER del proyecto al que pertenece la tarea)
-    if not user_is_leader_of_task(id_usuario, id_tarea):
+    if not user_is_leader_of_task(int(id_usuario), id_tarea):
         return jsonify({"error": "Permiso denegado"}), 403
 
     conn = get_connection()

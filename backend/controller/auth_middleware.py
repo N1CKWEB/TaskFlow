@@ -2,8 +2,7 @@
 from functools import wraps
 from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from conection.conexion import get_connection
-
+from backend.conection.conexion import get_connection  # ✅ Ruta completa
 
 
 def _role_code(user_id, project_id):
@@ -17,7 +16,8 @@ def _role_code(user_id, project_id):
     cur = conn.cursor(dictionary=True)
     cur.execute(sql, (user_id, project_id))
     row = cur.fetchone()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return row["codigo"] if row else None
 
 def require_project_role(allowed_codes):
@@ -26,10 +26,14 @@ def require_project_role(allowed_codes):
         def wrapper(*args, **kwargs):
             verify_jwt_in_request()
             user_id = get_jwt_identity()
+            
             # buscar id_proyecto en path, args o body
-            project_id = kwargs.get("id_proyecto") or request.view_args.get("id_proyecto") \
-                         or request.args.get("id_proyecto") \
-                         or (request.get_json() or {}).get("id_proyecto")
+            project_id = (
+                kwargs.get("id_proyecto") or 
+                request.view_args.get("id_proyecto") or
+                request.args.get("id_proyecto") or 
+                (request.get_json() or {}).get("id_proyecto")
+            )
 
             if not project_id:
                 return jsonify({"error": "id_proyecto requerido"}), 400
