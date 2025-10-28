@@ -24,6 +24,17 @@ export async function apiRegister(datos) {
   return r.json();
 }
 
+// ---- CREAR PROYECTO ----
+export async function apiCrearProyecto(body) {
+  const r=await fetch(`${API}/proyecto`,{
+    method:'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw await r.json();
+  return r.json();
+}
+
 // ---- CREAR TAREA ----
 export async function apiCrearTarea(body) {
   const r = await fetch(`${API}/tareas`, {
@@ -41,3 +52,4 @@ export async function apiListarTareas(idUsuario) {
   if (!r.ok) throw await r.json();
   return r.json();
 }
+

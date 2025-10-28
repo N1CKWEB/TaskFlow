@@ -6,7 +6,6 @@
 }
 
 /* === Sidebar === */
-
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -15,21 +14,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-/* Home.css */
-.sidebar {
-  width: 250px;
-  height: 100vh;
-  background: linear-gradient(#0a1227, #0c7fa6);
-  /* Podés cambiar colores */
-  color: white;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
+/* Línea debajo del logo */
 .sidebar-line {
   display: flex;
   margin-top: 10px;
@@ -70,7 +58,6 @@ a:hover {
   height: 50px;
   width: 100%;
   border-radius: 10px;
-  margin-right: 60px;
   background-color: #0c7fa6;
   align-items: center;
   justify-content: center;
@@ -78,6 +65,7 @@ a:hover {
   cursor: pointer;
 }
 
+/* === User box / Logout === */
 .user-box {
   margin-top: auto;
   padding: 12px 10px;
@@ -87,14 +75,15 @@ a:hover {
   gap: 10px;
 }
 
+/* logout-style: vidrio translúcido con icono a la izquierda */
 .logout-button {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   color: #ffffff;
   font-weight: 600;
@@ -102,19 +91,19 @@ a:hover {
   text-align: center;
   cursor: pointer;
   padding: 10px 0;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
 }
 
 .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
 }
 
 .icon-logout {
   font-size: 20px;
   color: #ffffff;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
 .logout-button:hover .icon-logout {
@@ -134,6 +123,7 @@ a:hover {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.06);
 }
 
 .user-texts {
@@ -155,13 +145,15 @@ a:hover {
   margin: 0;
 }
 
-
 /* === Contenido principal === */
 .content {
   flex: 1;
   background-color: rgb(31, 45, 61);
   padding: 50px;
   color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Texto principal */
@@ -192,71 +184,204 @@ a:hover {
   font-size: 16px;
 }
 
-/* Proyectos */
+/* === GRID DE PROYECTOS === */
 .projects-container {
-  margin-top: 50px;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  /* width: 200px;
-  height: 200px;
-  border-radius: 18px;
-  background-color: red; */
+  margin-top: 30px;
+  width: 100%;
 }
 
-/* Acciones */
-.actions {
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+  width: 100%;
+  justify-items: center;
 }
 
-.title-actions {
-  font-size: 22px;
-  font-weight: bold;
-  margin-top: 40px;
+.project-card {
+  width: 180px;
+  height: 180px;
+  border-radius: 14px;
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  background-color: #101722;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.project-initials {
+  font-size: 26px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+
+.project-name {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* === BOTONES NUEVO / IMPORTAR === */
+.actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
 }
 
 .new-btn,
 .import-btn {
-
-  padding: 12px 24px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 190px;
+  border: none;
+  transition: all 0.18s ease;
+  font-size: 14px;
 }
 
 .new-btn {
-  background-color: #00d4d8;
-  color: black;
+  background-color: #00c2ff;
+  color: #042031;
+  box-shadow: 0 6px 14px rgba(0, 194, 255, 0.14);
 }
 
 .import-btn {
-
-  background-color: #05111d;
-  color: white;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* --- Animaciones de aparición y cierre --- */
+.new-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(0.98);
+}
+
+.import-btn:hover {
+  transform: translateY(-3px);
+  border-color: #00c2ff;
+  color: #00c2ff;
+}
+
+/* === FORMULARIO NUEVO PROYECTO === */
 .card-new-project {
-  display: flex;
-  flex-direction: column;
-  width: 90%;
-  max-width: 480px;
-  background-color: #000;
-  border-radius: 20px;
-  padding: 25px 20px;
+  background-color: #0f1620;
+  padding: 24px;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   box-sizing: border-box;
-  margin: 30px auto 0 auto;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  color: white;
+  animation: fadeInSlide 0.42s ease both;
+  margin: 0 auto;
+  position: relative;
 }
 
-/* --- Animaciones de aparición y cierre (horizontal) --- */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Inputs dentro del formulario */
+.title-new-project,
+.title-team {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.search-input-project,
+.search-input-members {
+  width: 100%;
+  height: 44px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background-color: #10161b;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: white;
+  box-sizing: border-box;
+}
+
+/* input de miembro */
+.member-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+/* Botón agregar desarrollador */
+.button-user-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: #121416;
+  color: white;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  margin: 6px auto 0 auto;
+}
+
+/* Botón crear proyecto */
+.button-create-project {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background-color: #00c2ff;
+  color: #042031;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  margin: 12px auto 0;
+}
+
+/* Botón cerrar */
+.button-close-project {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: #ff4b4b;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  margin: 12px auto 0;
+}
+
+/* === Animaciones de apertura / cierre (restauradas) === */
 .card-new-project.opening {
   animation: fadeInLeft 0.6s ease forwards;
 }
@@ -264,6 +389,7 @@ a:hover {
 .card-new-project.closing {
   animation: fadeOutRight 0.5s ease forwards;
   pointer-events: none;
+  /* evita clicks mientras cierra */
 }
 
 /* Aparece desde la izquierda */
@@ -293,152 +419,7 @@ a:hover {
 }
 
 
-/* Botón cerrar */
-.button-close-project {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 320px;
-  height: 50px;
-  border-radius: 20px;
-  background-color: #ff4b4b;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  margin: 15px auto 0;
-  font-size: 16px;
-  transition: background 0.3s ease;
-}
-
-.button-close-project:hover {
-  background-color: #ff7070;
-}
-
-.buttons-project-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-
-.title-new-project,
-.title-team {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: white;
-}
-
-.search-input-project,
-.search-input-members {
-  width: 100%;
-  height: 45px;
-  padding: 0 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  background-color: #1f2e3c;
-  border: 1px solid #2d3f50;
-  color: white;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-.member-input {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.icon-users {
-  cursor: pointer;
-  color: white;
-  font-size: 24px;
-}
-
-.button-user-add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 60%;
-  max-width: 320px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: rgb(25, 27, 27);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  margin: 0 auto;
-  position: relative;
-  bottom: 20px;
-}
-
-.button-create-project {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 320px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: rgb(10, 196, 196);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  margin: 0 auto;
-  font-size: 18px;
-}
-
-.title-user-add {
-  display: inline-block;
-}
-
-/* Media queries para pantallas más pequeñas */
-@media (max-width: 500px) {
-  .card-new-project {
-    padding: 20px 15px;
-  }
-
-  .search-input-project,
-  .search-input-members {
-    font-size: 14px;
-    height: 40px;
-  }
-
-  .icon-users {
-    font-size: 20px;
-  }
-
-  .button-user-add {
-    height: 50px;
-    font-size: 14px;
-  }
-}
-
-/* Animación de entrada de nuevos campos */
-.fadeIn {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Botón de eliminar desarrollador */
+/* eliminar desarrollador */
 .delete-dev-btn {
   background: none;
   border: none;
@@ -446,75 +427,306 @@ a:hover {
   font-size: 18px;
   cursor: pointer;
   transition: color 0.2s ease;
+  position: relative;
+  z-index: 5;
 }
 
 .delete-dev-btn:hover {
   color: #ff7070;
 }
 
-/* === GRID DE PROYECTOS === */
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .content {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .logout-button {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px;
+  }
+
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .actions {
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .card-new-project {
+    max-width: 100%;
+    padding: 14px;
+    margin-top: 14px;
+  }
+}
+
+.project-card.ver-mas {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.8s ease, transform 0.8s ease;
+}
+
+.project-card.ver-mas:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* === GRID DE PROYECTOS RESPONSIVE MEJORADO === */
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 25px;
-  margin-top: 40px;
-  padding: 10px 0;
+  margin-top: 20px;
+  width: 100%;
   justify-items: center;
+  align-items: start;
 }
 
-/* === TARJETA DE PROYECTO === */
 .project-card {
-  width: 220px;
-  height: 180px;
-  border-radius: 18px;
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  position: relative;
-  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  background-color: #101722;
 }
 
 .project-card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-/* Siglas grandes (iniciales del proyecto) */
-.project-initials {
-  font-size: 48px;
-  font-weight: bold;
-  opacity: 0.85;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+/* Ajuste visual para pantallas grandes */
+@media (min-width: 1200px) {
+  .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
+    padding: 0 50px;
+  }
 }
 
-/* Nombre del proyecto */
-.project-name {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
+/* Ajuste para tablets */
+@media (max-width: 900px) {
+  .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Ajuste para móviles */
+@media (max-width: 600px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .project-card {
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+/* === BOTÓN HAMBURGUESA (SIEMPRE VISIBLE) === */
+.hamburger-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #0c7fa6;
   color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 22px;
+  z-index: 2000;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
-/* Animación de aparición de nuevas tarjetas */
-.project-card {
-  animation: fadeInCard 0.4s ease both;
+.hamburger-btn:hover {
+  background: #119cc9;
+  transform: scale(1.1);
 }
 
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(15px) scale(0.98);
+
+/* === SIDEBAR TOGGLE === */
+.sidebar {
+  transition: transform 0.4s ease-in-out;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    width: 250px;
+    height: 100%;
+    z-index: 1000;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  .sidebar.open {
+    transform: translateX(0);
   }
+
+  .content {
+    padding-top: 80px;
+  }
+}
+
+/* === Sidebar animado desde la izquierda === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #0a1227, #0c7fa6);
+  color: #fff;
+  transition: left 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.hamburger-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Apertura rápida */
+.layout.sidebar-open .content {
+  transform: translateX(200px);
+  transition: transform 0.8s ease-out;
+  /* rápido al abrir */
+}
+
+/* Cierre lento */
+.layout .content {
+  transform: translateX(0);
+  transition: transform 0.35s ease-in;
+  /* lento al cerrar */
+}
+
+
+.sidebar.open+.hamburger-btn,
+.sidebar.open~.hamburger-btn {
+  left: 270px !important;
+  transition: left 0.35s ease;
+  top: 6px;
+}
+
+/* === Mueve el botón hamburguesa cerca de TaskFlow cuando se abre el menú === */
+.layout.sidebar-open .hamburger-btn {
+  left: 160px !important;
+  /* ajustá este valor según el ancho del texto "TaskFlow" */
+  transition: left 0.4s ease;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* separa el texto del botón */
+}
+
+/* === SIDEBAR CON ANIMACIÓN DIFERENCIADA (ABRIR/CERRAR) === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #0a1227, #0c7fa6);
+  color: #fff;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: left 0.5s ease-in;
+  /* cierre más lento */
+}
+
+.sidebar.open {
+  left: 0;
+  transition: left 0.35s ease-out;
+  /* apertura más rápida */
+}
+
+/* === BOTÓN HAMBURGUESA === */
+.hamburger-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, left 0.5s ease-in;
+  /* más lenta al volver */
+}
+
+.sidebar.open+.hamburger-btn,
+.sidebar.open~.hamburger-btn {
+  left: 160px !important;
+  /* ajustado para quedar al lado de TaskFlow */
+  transition: left 0.35s ease-out;
+  /* más rápida al abrir */
+}
+
+/* === ELIMINAR SCROLLS CUANDO EL TOGGLE ESTÁ ABIERTO === */
+body.sidebar-open,
+html.sidebar-open {
+  overflow: hidden;
+}
+
+/* Para asegurar que no aparezca scroll horizontal en ningún caso */
+body,
+html {
+  overflow-x: hidden;
 }
