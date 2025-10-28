@@ -1,5 +1,5 @@
 import '../../src/styles/Home.css';
-import React, { use, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
@@ -21,13 +21,21 @@ export function Home() {
   const [nuevoProyecto, setNuevoProyecto] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
   const [mostrarTodos, setMostrarTodos] = useState(false);
+  const [nombreUsuario, setNombreUsuario] = useState("");
+  const [mensajeLogout, setMensajeLogout] = useState("");
+
+
+  useEffect(() => {
+    const nombre = localStorage.getItem("nombre_usuario");
+    if (nombre) {
+      setNombreUsuario(nombre);
+    }
+  }, []);
 
   const handleCrearProyecto = () => {
     setMostrarFormulario(true);
     setAnimando("opening");
   };
-
-
 
   const handleCerrarFormulario = () => {
     setAnimando("closing");
@@ -61,8 +69,8 @@ export function Home() {
 
     const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
     const colorRandom = colores[Math.floor(Math.random() * colores.length)];
-    
-    
+
+
     const nuevo = {
       id: Date.now(),
       nombre: nuevoProyecto,
@@ -76,6 +84,23 @@ export function Home() {
     setDesarrolladores([""]);
     handleCerrarFormulario();
   };
+  const handleLogout = () => {
+    // Limpiar localStorage
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("nombre_usuario");
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol_usuario");
+    localStorage.removeItem("nombre_rol");
+
+    // Mostrar mensaje
+    setMensajeLogout("Sesión cerrada");
+
+    // Esperar 1.5 segundos y redirigir
+    setTimeout(() => {
+      window.location.href = "/login"; // o navigate("/login")
+    }, 1500);
+  };
+
 
   const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
 
@@ -103,14 +128,19 @@ export function Home() {
         </nav>
 
         <div className="user-box">
-          <button className="logout-button">
+          <button className="logout-button" onClick={handleLogout}>
             <RiLogoutBoxRLine className='icon-logout' />
             <span>Cerrar Sesión</span>
           </button>
+          {mensajeLogout && (
+            <div className="toast-logout">
+              {mensajeLogout}
+            </div>
+          )}
           <div className="user-info">
             <img src={userImg} className="user-avatar" alt="Usuario" />
             <div className="user-texts">
-              <p className="title-user-box">Nombre Usuario</p>
+              <p className="title-user-box">{nombreUsuario || "Usuario"}</p>
               <p className="subtitle-user-box">Líder de Proyecto</p>
             </div>
           </div>
@@ -126,7 +156,7 @@ export function Home() {
 
       {/* === CONTENIDO PRINCIPAL === */}
       <main className="content">
-        <h1 className="title">Hola Nicolás</h1>
+        <h1 className="title">Hola {nombreUsuario || "Usuario"}</h1>
         <p className="subtitle">¡Bienvenido de nuevo al espacio de trabajo, te extrañamos!</p>
 
         <input
