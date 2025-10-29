@@ -1,4 +1,5 @@
 import '../../src/styles/dashboardTeam.css';
+import '../../src/styles/Home.css';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
@@ -9,6 +10,8 @@ import { GoProjectSymlink } from 'react-icons/go';
 import { IoCaretBackCircleOutline } from "react-icons/io5";
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export function DashboardTeam() {
   const navigate = useNavigate();
@@ -24,6 +27,7 @@ export function DashboardTeam() {
   const [showForm, setShowForm] = useState(false);
   const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
   const [tareas, setTareas] = useState([]);
+  const [sidebarAbierta, setSidebarAbierta] = useState(false);
   
   // Estados del formulario
   const [nombre, setNombre] = useState("");
@@ -309,12 +313,11 @@ export function DashboardTeam() {
   );
 
   return (
-    
-    <div className="layout">
-    
-      <aside className="sidebar">
+    <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
+      {/* === SIDEBAR DESLIZANTE === */}
+      <aside className={`sidebar ${sidebarAbierta ? 'open' : ''}`}>
         <h2 className="sidebar-title">TaskFlow</h2>
-        <hr className="sidebar-line" />
+        <hr className='sidebar-line' />
         <nav className="menu">
           <Link to="/" className="menu-link">
             Proyecto
@@ -344,9 +347,16 @@ export function DashboardTeam() {
           </div>
         </div>
       </aside>
+    
+      {/* === BOTÓN HAMBURGUESA === */}
+      <button
+        className="hamburger-btn"
+        onClick={() => setSidebarAbierta(!sidebarAbierta)}>
+        {sidebarAbierta ? <FaTimes/> : <GiHamburgerMenu/> }
+      </button>
 
       <main className="content">
-        <IoCaretBackCircleOutline className="icon-project" />
+        <IoCaretBackCircleOutline className="icon-project--back" />
         <h2 className="tittle-name-project">Nombre del proyecto</h2>
 
         <div className="container-bar-progress">
@@ -363,14 +373,18 @@ export function DashboardTeam() {
         {!puedeCrearTareas() && (
           <div style={{ 
             padding: '15px', 
-            margin: '10px 0',
+            margin: '10px auto',
             backgroundColor: '#2a2a2a',
             borderRadius: '8px',
             color: '#ffaa00',
-            textAlign: 'center'
+            textAlign: 'center',
+            maxWidth: '600px'
           }}>
-            <p>⚠️ Solo puedes visualizar las tareas asignadas a ti.</p>
-            <p style={{ fontSize: '14px', marginTop: '5px', color: '#888' }}>
+            <p style={{ fontSize: '16px', fontWeight: 'bold' }}>⚠️ Modo Solo Lectura</p>
+            <p style={{ fontSize: '14px', marginTop: '8px', color: '#ccc' }}>
+              Solo puedes visualizar las tareas asignadas a ti.
+            </p>
+            <p style={{ fontSize: '12px', marginTop: '5px', color: '#888' }}>
               No tienes permisos para crear o editar tareas.
             </p>
           </div>
@@ -394,7 +408,10 @@ export function DashboardTeam() {
           <div className="overlay">
             <div className="card-create-task">
               <h2 className="title-create-task">
-                {tareaSeleccionada ? "Ver tarea" : "Crear nueva tarea"}
+                {tareaSeleccionada 
+                  ? (puedeEditarTareas() ? "Editar tarea" : "Ver tarea")
+                  : "Crear nueva tarea"
+                }
               </h2>
 
               <input
@@ -513,8 +530,16 @@ export function DashboardTeam() {
                       </button>
                     </>
                   ) : (
-                    <p style={{ color: '#888', textAlign: 'center', marginTop: '10px' }}>
-                      Solo puedes visualizar esta tarea
+                    <p style={{ 
+                      color: '#ffaa00', 
+                      textAlign: 'center', 
+                      marginTop: '15px',
+                      padding: '10px',
+                      backgroundColor: '#2a2a2a',
+                      borderRadius: '8px',
+                      fontWeight: 'bold'
+                    }}>
+                      ⚠️ Solo puedes visualizar esta tarea (Modo Lectura)
                     </p>
                   )}
                 </>

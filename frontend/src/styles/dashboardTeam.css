@@ -13,15 +13,17 @@ html, body {
   background-color: #0d1117; /* igual que el body */
 }
 
-.icon-project {
+.icon-project--back {
   font-size: 27px;
   color: white;
+  position: relative;
+  left: 6%;
 }
 
 .tittle-name-project {
   position: relative;
   bottom: 29px;
-  left: 29px;
+  right: 36%;
   font-weight: bold;
   font-size: 20px;
 }
@@ -852,4 +854,238 @@ main.content {
 .title-user-add{
   font-weight: bold;
   font-size: 14px;
+}
+
+
+/* === BOTÓN HAMBURGUESA (SIEMPRE VISIBLE) === */
+/* 🖥️ Monitores medianos (entre 1200 y 1599px) */
+@media (max-width: 1599px) and (min-width: 1200px) {
+    /* === Fondo del modal === */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    overflow: hidden; /* bloquea el scroll del body */
+  }
+  .hamburger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #0c7fa6;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 22px;
+    z-index: 2000;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  
+  .hamburger-btn:hover {
+    background: #119cc9;
+    transform: scale(1.1);
+    
+  }
+  
+  
+  /* === SIDEBAR TOGGLE === */
+  .sidebar {
+    transition: transform 0.4s ease-in-out;
+    
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    width: 250px;
+    height: 500%;
+    z-index: 100;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .content {
+    padding-top: 80px;
+  }
+}
+
+/* === Sidebar animado desde la izquierda === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #0a1227, #0c7fa6);
+  color: #fff;
+  transition: left 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.hamburger-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Apertura rápida */
+.layout.sidebar-open .content {
+  transform: translateX(200px);
+  transition: transform 0.8s ease-out;
+  /* rápido al abrir */
+}
+
+/* Cierre lento */
+.layout .content {
+  transform: translateX(0);
+  transition: transform 0.35s ease-in;
+  /* lento al cerrar */
+}
+
+
+.sidebar.open+.hamburger-btn,
+.sidebar.open~.hamburger-btn {
+  left: 270px !important;
+  transition: left 0.35s ease;
+  top: 6px;
+}
+
+/* === Mueve el botón hamburguesa cerca de TaskFlow cuando se abre el menú === */
+.layout.sidebar-open .hamburger-btn {
+  left: 160px !important;
+  /* ajustá este valor según el ancho del texto "TaskFlow" */
+  transition: left 0.4s ease;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* separa el texto del botón */
+}
+
+/* === SIDEBAR CON ANIMACIÓN DIFERENCIADA (ABRIR/CERRAR) === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #0a1227, #0c7fa6);
+  color: #fff;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: left 0.5s ease-in;
+  /* cierre más lento */
+}
+
+.sidebar.open {
+  left: 0;
+  transition: left 0.35s ease-out;
+  /* apertura más rápida */
+}
+
+/* === BOTÓN HAMBURGUESA === */
+.hamburger-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, left 0.5s ease-in;
+  /* más lenta al volver */
+}
+
+.sidebar.open+.hamburger-btn,
+.sidebar.open~.hamburger-btn {
+  left: 160px !important;
+  /* ajustado para quedar al lado de TaskFlow */
+  transition: left 0.35s ease-out;
+  /* más rápida al abrir */
+}
+
+/* === ELIMINAR SCROLLS CUANDO EL TOGGLE ESTÁ ABIERTO === */
+body.sidebar-open,
+html.sidebar-open {
+  overflow: hidden;
+}
+
+/* Para asegurar que no aparezca scroll horizontal en ningún caso */
+body,
+html {
+  overflow-x: hidden;
+}
+
+.toast-logout {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  opacity: 0.9;
+  z-index: 1000;
+  font-weight: bold;
+  animation: fadeInOut 1.5s forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  10% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+
+  90% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
