@@ -1,5 +1,5 @@
 # backend/model/taskModel.py
-from conection.conexion import get_connection
+from backend.conection.conexion import get_connection
 
 # ================== FUNCIONES PARA TAREAS ==================
 

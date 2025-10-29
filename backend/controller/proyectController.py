@@ -14,7 +14,7 @@ def crear_proyecto():
     Crea un proyecto con título y miembros del equipo (solo nombres).
     Solo usuarios con rol LIDER o ADMIN pueden crear proyectos.
     """
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())  # ✅ Convertir a int
     
     # Verificar que el usuario sea LIDER o ADMIN
     conn = get_connection()
@@ -95,7 +95,7 @@ def mis_proyectos():
     Lista todos los proyectos donde el usuario es miembro.
     Cualquier usuario puede ver sus proyectos.
     """
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())  # ✅ Convertir a int
     conn = get_connection()
     cur = conn.cursor(dictionary=True)
     
@@ -130,7 +130,7 @@ def detalle_proyecto(id_proyecto):
     """
     Obtiene los detalles de un proyecto específico.
     """
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())  # ✅ Convertir a int
     conn = get_connection()
     cur = conn.cursor(dictionary=True)
     
