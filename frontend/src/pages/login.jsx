@@ -9,7 +9,7 @@ export default function Login() {
     lider: 2,
     desarrollador: 3,
   };
-
+  const [mensaje, setMensaje] = useState("");
   const [activeTab, setActiveTab] = useState("login");
   const [formData, setFormData] = useState({
     username: "",
@@ -141,13 +141,13 @@ export default function Login() {
           >
             <div className="form-inner">
               <div className="form-group">
-                <label>Nombre</label>
+                <label>Nombre y Apellido</label>
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="Nombre completo"
+                  placeholder="Nombre y Apellido"
                 />
               </div>
               <div className="form-group">
@@ -157,7 +157,7 @@ export default function Login() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="tu@email.com"
+                  placeholder="tucorreo@gmail.com"
                 />
               </div>
               <div className="form-group">
@@ -200,6 +200,11 @@ export default function Login() {
           </form>
         </div>
       </div>
+      {mensaje && (
+        <div className="toast-login">
+          {mensaje}
+        </div>
+      )}
     </div>
   );
 }

@@ -11,73 +11,28 @@ import { RiUserStarFill } from "react-icons/ri";
 import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
-import { GoProjectSymlink } from 'react-icons/go';
-import { FaTimes } from "react-icons/fa";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export function Home() {
-  const navigate = useNavigate();
-  
-  // 🔐 Obtener datos del usuario logueado
-  const [usuario, setUsuario] = useState({
-    id: null,
-    nombre: "",
-    rol_id: null,
-    rol_codigo: ""
-  });
-
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [animando, setAnimando] = useState(false);
   const [sidebarAbierta, setSidebarAbierta] = useState(false);
   const [proyectos, setProyectos] = useState([]);
   const [nuevoProyecto, setNuevoProyecto] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
+  const [nombreUsuario, setNombreUsuario] = useState("");
+  const [mensajeLogout, setMensajeLogout] = useState("");
 
-  // 🔄 Cargar datos del usuario al montar el componente
+
   useEffect(() => {
-    const usuarioData = {
-      id: localStorage.getItem("usuario_id"),
-      nombre: localStorage.getItem("nombre_usuario") || "Usuario",
-      rol_id: parseInt(localStorage.getItem("rol_id")),
-      rol_codigo: localStorage.getItem("rol_codigo") || ""
-    };
-    setUsuario(usuarioData);
+    const nombre = localStorage.getItem("nombre_usuario");
+    if (nombre) {
+      setNombreUsuario(nombre);
+    }
   }, []);
 
-  // ✅ Verificar si puede crear proyectos (Dueño o Líder)
-  const puedeCrearProyectos = () => {
-    return usuario.rol_id === 1 || usuario.rol_id === 2;
-  };
-
-  // 🚪 Cerrar sesión
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario_id");
-    localStorage.removeItem("nombre_usuario");
-    localStorage.removeItem("rol_id");
-    localStorage.removeItem("rol_codigo");
-    navigate("/login");
-  };
-
-  // 📋 Obtener nombre del rol en español
-  const obtenerNombreRol = () => {
-    switch(usuario.rol_id) {
-      case 1:
-        return "Dueño del Proyecto";
-      case 2:
-        return "Líder de Proyecto";
-      case 3:
-        return "Desarrollador";
-      default:
-        return "Usuario";
-    }
-  };
-
   const handleCrearProyecto = () => {
-    if (!puedeCrearProyectos()) {
-      alert("No tienes permisos para crear proyectos");
-      return;
-    }
     setMostrarFormulario(true);
     setAnimando("opening");
   };
@@ -104,10 +59,7 @@ export function Home() {
   };
 
   const handleCrearProyectoFinal = () => {
-    if (nuevoProyecto.trim() === "") {
-      alert("Por favor ingresa un nombre para el proyecto");
-      return;
-    }
+    if (nuevoProyecto.trim() === "") return;
 
     const siglas = nuevoProyecto
       .split(" ")
@@ -117,7 +69,8 @@ export function Home() {
 
     const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
     const colorRandom = colores[Math.floor(Math.random() * colores.length)];
-    
+
+
     const nuevo = {
       id: Date.now(),
       nombre: nuevoProyecto,
@@ -131,6 +84,23 @@ export function Home() {
     setDesarrolladores([""]);
     handleCerrarFormulario();
   };
+  const handleLogout = () => {
+    // Limpiar localStorage
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("nombre_usuario");
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol_usuario");
+    localStorage.removeItem("nombre_rol");
+
+    // Mostrar mensaje
+    setMensajeLogout("Sesión cerrada");
+
+    // Esperar 1.5 segundos y redirigir
+    setTimeout(() => {
+      window.location.href = "/login"; // o navigate("/login")
+    }, 1500);
+  };
+
 
   const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
 
@@ -162,12 +132,16 @@ export function Home() {
             <RiLogoutBoxRLine className='icon-logout' />
             <span>Cerrar Sesión</span>
           </button>
+          {mensajeLogout && (
+            <div className="toast-logout">
+              {mensajeLogout}
+            </div>
+          )}
           <div className="user-info">
             <img src={userImg} className="user-avatar" alt="Usuario" />
-            <img src={userImg} className="user-avatar" alt="Avatar" />
             <div className="user-texts">
-              <p className="title-user-box">{usuario.nombre}</p>
-              <p className="subtitle-user-box">{obtenerNombreRol()}</p>
+              <p className="title-user-box">{nombreUsuario || "Usuario"}</p>
+              <p className="subtitle-user-box">Líder de Proyecto</p>
             </div>
           </div>
         </div>
@@ -182,7 +156,7 @@ export function Home() {
 
       {/* === CONTENIDO PRINCIPAL === */}
       <main className="content">
-        <h1 className="title">Hola {usuario.nombre}</h1>
+        <h1 className="title">Hola {nombreUsuario || "Usuario"}</h1>
         <p className="subtitle">¡Bienvenido de nuevo al espacio de trabajo, te extrañamos!</p>
 
         <input
@@ -220,33 +194,13 @@ export function Home() {
         <div className="actions">
           {!mostrarFormulario && (
             <>
-              {/* ✅ Solo Dueño (1) y Líder (2) pueden crear proyectos */}
-              {puedeCrearProyectos() ? (
-                <>
-                  <button onClick={handleCrearProyecto} className="new-btn">
-                    + Nuevo Proyecto
-                  </button>
-                  <button className="import-btn">Importar Proyecto</button>
-                </>
-              ) : (
-                <div style={{ 
-                  padding: '20px', 
-                  textAlign: 'center', 
-                  color: '#888',
-                  fontStyle: 'italic' 
-                }}>
-                  <p>⚠️ No tienes permisos para crear proyectos.</p>
-                  <p style={{ fontSize: '14px', marginTop: '8px' }}>
-                    Solo los Dueños y Líderes pueden crear proyectos.
-                  </p>
-                </div>
-              )}
+              <button onClick={handleCrearProyecto} className="new-btn">+ Nuevo Proyecto</button>
+              <button className="import-btn">Importar Proyecto</button>
             </>
           )}
         </div>
 
-        {/* ✅ Solo mostrar formulario si tiene permisos */}
-        {mostrarFormulario && puedeCrearProyectos() && (
+        {mostrarFormulario && (
           <div className={`card-new-project ${animando}`}>
             <h2 className='title-new-project'>Título del Proyecto</h2>
             <input

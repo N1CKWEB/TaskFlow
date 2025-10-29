@@ -2,7 +2,7 @@
 from functools import wraps
 from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from backend.conection.conexion import get_connection  # ✅ Ruta completa
+from backend.conection.conexion import get_connection
 
 
 def _role_code(user_id, project_id):
@@ -20,12 +20,13 @@ def _role_code(user_id, project_id):
     conn.close()
     return row["codigo"] if row else None
 
+
 def require_project_role(allowed_codes):
     def deco(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             verify_jwt_in_request()
-            user_id = get_jwt_identity()
+            user_id = int(get_jwt_identity())  # ✅ Convertir a int
             
             # buscar id_proyecto en path, args o body
             project_id = (

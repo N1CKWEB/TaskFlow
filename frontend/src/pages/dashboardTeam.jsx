@@ -1,5 +1,4 @@
 import '../../src/styles/dashboardTeam.css';
-import '../../src/styles/Home.css';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
@@ -310,7 +309,9 @@ export function DashboardTeam() {
   );
 
   return (
+    
     <div className="layout">
+    
       <aside className="sidebar">
         <h2 className="sidebar-title">TaskFlow</h2>
         <hr className="sidebar-line" />
