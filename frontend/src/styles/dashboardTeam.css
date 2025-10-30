@@ -1,16 +1,20 @@
-html, body {
+/* ===== BASE / ESTRUCTURA ===== */
+html,
+body {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0d1117; /* o el tono oscuro que estés usando (#101315, #0f1214, etc.) */
-  overflow-x: hidden; /* evita scroll horizontal innecesario */
+  background-color: #0d1117;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 #root {
   width: 100%;
   height: 100%;
-  background-color: #0d1117; /* igual que el body */
+  background-color: #0d1117;
 }
 
 .icon-project {
@@ -18,12 +22,12 @@ html, body {
   color: white;
 }
 
+/* título del proyecto: usamos margin en lugar de posiciones absolutas */
 .tittle-name-project {
-  position: relative;
-  bottom: 29px;
-  left: 29px;
   font-weight: bold;
   font-size: 20px;
+  color: white;
+  margin: 8px 0 18px 18px;
 }
 
 /* Contenedor general */
@@ -33,16 +37,22 @@ main.content {
   padding: 40px;
   width: 100%;
   box-sizing: border-box;
+  align-items: stretch;
+  gap: 16px;
+  min-height: 100vh;
 }
 
-/* Barra de progreso */
+/* ===== BARRA DE PROGRESO ===== */
 .container-bar-progress {
   width: 100%;
+  max-width: 1400px;
   height: 60px;
   background-color: rgb(15, 17, 17);
   border-radius: 12px;
   position: relative;
-  margin-top: 10px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  box-sizing: border-box;
 }
 
 .barr-progress {
@@ -52,9 +62,8 @@ main.content {
   background-color: rgb(10, 210, 210);
   position: absolute;
   top: 20px;
-  left: 0.5%;
+  left: 2%;
 }
-
 
 .tittle-bar--progress {
   font-size: 12px;
@@ -72,7 +81,7 @@ main.content {
   right: 10px;
 }
 
-/* Botón */
+/* ===== BOTÓN PRINCIPAL (puede ser global o por columna) ===== */
 .button--projects {
   width: 150px;
   height: 50px;
@@ -91,57 +100,88 @@ main.content {
   background-color: rgb(21, 142, 203);
 }
 
-/* Cards */
+/* ===== CONTENEDOR DE CARDS / COLUMNAS ===== */
+/* estilo principal: filas flex con wrap para responsive */
 .container-template {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 50px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 
+/* Cada columna (To Do / In Progress / Done) */
 .template {
-  width: auto;
-  height: auto;
+  width: 100%;
+  max-width: 320px;
+  flex: 1 1 250px;
   background-color: rgb(32, 32, 32);
   border-radius: 20px;
-  position: relative;
   padding: 15px;
   box-sizing: border-box;
-  flex: 1 1 250px;
-  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  min-height: 180px;
+  height: 360px;
+  /* altura con scroll interno estilo Trello */
+  overflow-y: auto;
+  scrollbar-color: #0ad2d2 #202224;
 }
 
+/* Scrollbar personalizado (Chrome / Edge) */
+.template::-webkit-scrollbar {
+  width: 6px;
+}
+
+.template::-webkit-scrollbar-thumb {
+  background-color: #0ad2d2;
+  border-radius: 6px;
+}
+
+.template::-webkit-scrollbar-track {
+  background-color: #202224;
+}
+
+/* Título dentro de cada columna */
+/* evitamos position:absolute para que sea fluido */
 .title-name,
 .title-name--v {
   font-weight: bold;
   font-size: 16px;
-  margin-bottom: 10px;
+  margin: 6px 0 0 8px;
   color: white;
-  position: absolute;
-  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+/* Iconos de acción (colocados en header-row) */
+.header-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+/* iconos individuales (si los usás absolutos en HTML, conservar) */
 .icon-edit,
 .icon-add,
 .icon-edit--v,
 .icon-add--v {
   font-size: 20px;
   cursor: pointer;
-  position: absolute;
-  top: 15px;
 }
 
-.icon-edit,
-.icon-edit--v {
-  right: 50px;
-}
-
-.icon-add,
-.icon-add--v {
-  right: 20px;
-}
-
-/* Colores de estado */
+/* Colores de estado (círculo) */
 .template-color-to-do,
 .template-color-in-progress,
 .template-color-done {
@@ -149,9 +189,8 @@ main.content {
   height: 18px;
   border-radius: 50%;
   object-fit: cover;
-  position: absolute;
-  top: 20px;
-  left: 10px;
+  display: inline-block;
+  margin-right: 8px;
 }
 
 .template-color-to-do {
@@ -166,172 +205,149 @@ main.content {
   background-color: green;
 }
 
-/* Tareas dentro del card */
+/* ===== TAREAS DENTRO DEL CARD ===== */
 .complete-task-template {
-  width: 230px;
-  height: 127px;
+  width: calc(100% - 10px);
+  min-height: 80px;
   background-color: rgb(57, 57, 57);
-  border-radius: 20px;
-  margin: 35px auto 0;
+  border-radius: 12px;
+  margin: 0 auto;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #fff;
 }
 
-.title-complete-task-template{
+.title-complete-task-template {
   display: flex;
   font-size: 14px;
-  position: relative;
-  left: 15px;
   font-weight: bold;
-  top: 16px; 
+  align-items: center;
+  gap: 8px;
 }
 
-.date-complete-task-template{
-  display: flex;
+.date-complete-task-template {
   font-size: 13px;
-  position: relative;
-  left: 135px;
-  font-weight: bold;
-  top: 25px; 
+  font-weight: normal;
   color: gray;
-  opacity: 0.4px;
-  
+  opacity: 0.8;
 }
-.icon-calendar-task--complete{
-  position: relative;
-  right: 4px;
-  top:3px;
+
+.icon-calendar-task--complete {
+  margin-right: 6px;
 }
-.priority-complete-task-template{
-  display: flex;
-  font-size: 14px;
-  position: relative;
-  left: 160px;
+
+.priority-complete-task-template {
+  align-self: flex-end;
+  font-size: 13px;
   font-weight: bold;
-  bottom: 25px;
   background-color: red;
   width: 44px;
   text-align: center;
-  justify-content: center;
-  border-radius: 20px; 
-}
-/* Card Members */
-.members-template {
-  width: 330px;
-  height: 327px;
-  background-color: rgb(19, 16, 16);
   border-radius: 20px;
-  margin: 1px auto 0;
-  position:relative;
-  left: 6%;
-  bottom: 23%;
+  padding: 4px 6px;
+  color: #000;
 }
 
-.title-principal-membrers{
-    display: flex;
-    text-align: center;
-    font-weight: bold;
-    position: relative;
-    left: 25%;
-    top: 4%;
+/* ===== CARD MEMBERS ===== */
+/* Hacemos members-template relativo y responsive */
+.members-template {
+  width: 100%;
+  max-width: 330px;
+  height: auto;
+  background-color: rgb(19, 16, 16);
+  border-radius: 20px;
+  margin: 8px auto;
+  position: relative;
+  padding: 14px;
+  box-sizing: border-box;
 }
+
+.title-principal-membrers {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
 .user-avatar--members {
   cursor: pointer;
   width: 48px;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  position: relative;
-  top: 8%;
-  left: 3%;
 }
 
-.title-name-user-avatar{
- display: flex;
- font-weight: bold;
- position: relative;
- left: 21%;
- bottom: 5%;
- color: rgb(14, 165, 165);
+.title-name-user-avatar {
+  font-weight: bold;
+  color: rgb(14, 165, 165);
 }
 
-.rol-name-user-avatar{
- display: flex;
- font-size: 14px;
- color: gray;
- position: relative;
- left: 21%;
- bottom: 5%; 
+.rol-name-user-avatar {
+  font-size: 14px;
+  color: gray;
 }
 
-/* --- RESPONSIVE --- */
-
-/* Pantallas medianas (tablets) */
-@media (max-width: 992px) {
-  .container-template {
-    gap: 30px;
-  }
-
-  .template {
-    width: 45%;
-    height: auto;
-    min-height: 180px;
-  }
+/* ===== BOTÓN "+" Y BOTONES DE COLUMNA ===== */
+/* button-condition-add: NO absolute - queda dentro de la columna y se ubica donde pongas en HTML */
+.button-condition-add {
+  gap: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgb(25, 27, 27);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin: 6px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
 }
 
-/* Pantallas pequeñas (celulares) */
-@media (max-width: 600px) {
-  .tittle-name-project {
-    bottom: 15px;
-    left: 10px;
-    font-size: 18px;
-  }
-
-  .container-bar-progress {
-    height: 50px;
-  }
-
-  .button--projects {
-    width: 100%;
-    font-size: 15px;
-    height: 45px;
-  }
-
-  .container-template {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .template {
-    width: 90%;
-    height: auto;
-    min-height: 170px;
-  }
-
-  .complete-task-template {
-    width: 90%;
-  }
+.button-condition-add:hover {
+  transform: scale(1.05);
 }
 
-/* Card Crear Tarea */
+/* Si querés un botón "añadir" amplio dentro de cada columna */
+.button-add-in-column {
+  gap: 10px;
+  width: 90%;
+  max-width: 260px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: #ffc107;
+  color: #000;
+  font-weight: 700;
+  border: none;
+  margin: 8px auto;
+  cursor: pointer;
+}
+
+/* ===== MODAL / FORM CREAR TAREA ===== */
 /* Fondo oscuro del modal */
 .overlay {
-  position: fixed; /* cubre toda la pantalla */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6); /* sombra transparente */
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100; /* que quede por encima del resto */
+  z-index: 100;
 }
 
 /* Tarjeta del formulario */
 .card-create-task {
   background-color: #101315;
-  width: 90%;           /* ocupa casi todo en móviles */
-  height: 100%;           /* ocupa casi todo en móviles */
-  max-width: 480px;     /* pero nunca más de 480px */
+  width: 90%;
+  max-width: 480px;
   border-radius: 18px;
   padding: 25px 30px;
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
@@ -339,25 +355,24 @@ main.content {
   flex-direction: column;
   gap: 14px;
   animation: fadeIn 0.3s ease-in-out;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-
-/* Animación suave */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 
-/* Responsivo: mejora en pantallas pequeñas */
-@media (max-width: 768px) {
-  .card-create-task {
-    padding: 20px;
-    border-radius: 14px;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-
-/* Título */
+/* Inputs generales */
 .title-create-task {
   color: white;
   font-size: 20px;
@@ -365,8 +380,6 @@ main.content {
   margin-bottom: 10px;
 }
 
-
-/* Inputs generales */
 .input-task,
 .textarea-task,
 .select-priority,
@@ -381,16 +394,18 @@ main.content {
   font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
-.input-conditions{
-  width: 90%;
+
+.input-conditions {
+  width: 100%;
   margin-top: 10px;
 }
+
 .input-date::-webkit-calendar-picker-indicator {
   filter: invert(69%) sepia(91%) saturate(500%) hue-rotate(150deg);
   cursor: pointer;
 }
-
 
 .input-task::placeholder,
 .textarea-task::placeholder,
@@ -408,269 +423,114 @@ main.content {
   border: 1px solid rgb(10, 210, 210);
 }
 
-/* Textarea */
 .textarea-task {
   height: 90px;
   resize: none;
   padding: 20px;
 }
 
-/* Select */
-.select-priority {
+/* 🎨 Estilo base para TODOS los botones del modal */
+.button-add-condition,
+.button-create-task,
+.button-edit-task,
+.button-delete-task,
+.button-add-condition-task,
+.button-close-task {
+  color: #000;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: bold;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Botón agregar condición */
+.button-add-condition:hover,
+.button-create-task:hover,
+.button-edit-task:hover,
+.button-delete-task:hover,
+.button-add-condition-task:hover,
+.button-close-task:hover {
+  transform: scale(1.05);
+}
+
+/* 🔹 Colores individuales */
 .button-add-condition {
   background-color: #202224;
   color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 10px;
-  cursor: pointer;
-  transition: 0.2s ease;
 }
 
 .button-add-condition:hover {
   background-color: #303436;
 }
 
-/* Botón crear tarea */
 .button-create-task {
   background-color: rgb(25, 148, 148);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.button-edit-task {
-  background-color: rgb(14, 113, 92);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.button-delete-task {
-  background-color: rgba(9, 106, 210, 0.781);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-/* Botón crear tarea */
-.button-add-condition-task {
-  background-color: rgb(27, 188, 97);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-
-.button-close-task{
-  background-color: rgb(131, 18, 18);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
 }
 
 .button-create-task:hover {
   background-color: rgb(14, 240, 240);
 }
-.button-edit-task:hover{
+
+.button-edit-task {
+  background-color: rgb(14, 113, 92);
+}
+
+.button-edit-task:hover {
   background-color: rgb(5, 255, 201);
 }
 
+.button-delete-task {
+  background-color: rgba(9, 106, 210, 0.781);
+}
+
 .button-delete-task:hover {
-  background-color: rgb(0, 128, 255);  
+  background-color: rgb(0, 128, 255);
 }
 
-.button-close-task:hover{
+.button-add-condition-task {
+  background-color: rgb(27, 188, 97);
+}
+
+.button-add-condition-task:hover {
+  background-color: rgb(12, 250, 132);
+}
+
+.button-close-task {
+  background-color: rgb(131, 18, 18);
+}
+
+.button-close-task:hover {
   background-color: rgb(255, 0, 0);
-  
 }
 
 
-/* Responsive */
-@media (max-width: 600px) {
-  .card-create-task {
-    width: 90%;
-    padding: 20px;
-  }
-
-  .title-create-task {
-    font-size: 18px;
-  }
-}
-
-/* Responsive */
-@media (max-width: 1592px) {
-  /* Card Members */
-.members-template {
-  width: 262px;
-  height: 331px;
-  position: absolute;
-  margin-left: 72%;
-  left: 100px;
-}
-/* Cards */
-.container-template {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-  position: static;
-  margin-right: 300px;
-}
-.title-name-user-avatar{
- display: flex;
- position: relative;
- left: 60px;
-}
-.rol-name-user-avatar{
-  display: flex;
-  position: relative;
-  left: 60px;
-
-}
-}
-
-.container-template.drag-over {
-  background-color: rgb(212, 7, 7);
-  border: 2px dashed #888;
-}
-
-/* ===== Scroll interno tipo Trello ===== */
-.container-template {
-  align-items: flex-start;
-  gap: 20px;
-  margin-top: 50px;
-  padding-bottom: 10px;
-}
-
-.template {
-  flex-direction: column;
-  background-color: rgb(32, 32, 32);
-  border-radius: 20px;
-  padding: 15px;
-  flex: 1 1 250px;
-  max-width: 280px;
-
-  /* 🔽 Altura fija + scroll interno */
-  height: 360px;              /* podés ajustar según tu diseño */
-  overflow-y: auto;               /* scroll vertical */
-  scrollbar-color: #0ad2d2 #202224;
-}
-
-/* Scrollbar personalizado (Chrome / Edge) */
-.template::-webkit-scrollbar {
-  width: 6px;
-}
-.template::-webkit-scrollbar-thumb {
-  background-color: #0ad2d2;
-  border-radius: 6px;
-}
-.template::-webkit-scrollbar-track {
-  background-color: #202224;
-}
-
-.button-condition-add {
-  gap: 10px;
-  width: 5%;
-  max-width: 20%;
-  height: 50px;
-  border-radius: 20px;
-  background-color: rgb(25, 27, 27);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  margin: 0 auto;
-  position: absolute;
-  bottom: 245px;
-  left: 830px;
-}
-.icon-condition{
-  font-size: 23px;
-}
-.subtitle-conditions {
-  color: #e5e5e5;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.delete-dev-btn {
-  border: none;
-  color: #ff5c5c;
-  font-size: 18px;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: 0.2s;
-}
-
-.delete-dev-btn:hover {
-  color: #ff2e2e;
-}
-
-
-/* === Contenedor scroll de condiciones === */
+/* ===== CONTENEDOR SCROLL DE CONDICIONES ===== */
 .conditions-container {
-  max-height: 150px;              /* 🔽 altura fija visible */
-  overflow-y: auto;               /* scroll vertical */
-  background-color: #101315;      /* mismo color que el form */
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #101315;
   padding-right: 8px;
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-sizing: border-box;
 }
 
-/* Scrollbar personalizado */
 .conditions-container::-webkit-scrollbar {
   width: 6px;
 }
+
 .conditions-container::-webkit-scrollbar-thumb {
   background-color: #0ad2d2;
   border-radius: 6px;
 }
+
 .conditions-container::-webkit-scrollbar-track {
   background-color: #202224;
-}
-.conditions-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 150px; /* o el alto que quieras */
-  overflow-y: auto;
-  padding-right: 6px;
-  margin-bottom: 15px;
 }
 
 .input-conditions {
@@ -680,176 +540,148 @@ main.content {
   border-radius: 10px;
   padding: 10px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.member-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* ===== UTILIDADES / BOTÓN FIX DENTRO DE COLUMNA ===== */
+/* Si usás .button--projects dentro de .template, este selector lo adapta */
+.template .button--projects {
+  width: 90%;
+  margin: 8px auto 0;
+  align-self: center;
 }
 
-.delete-dev-btn {
-  background: none;
-  border: none;
-  color: #ff4d4d;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.2s;
+/* ===== ESTADOS: drag-over ===== */
+.container-template.drag-over {
+  background-color: rgba(212, 7, 7, 0.06);
+  border: 2px dashed #888;
 }
 
-.delete-dev-btn:hover {
-  color: #ff0000;
-}
+/* ===== RESPONSIVE: ADAPTACIONES ===== */
 
-
-/* Alinear inputs + botón X */
-.member-input {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-/* 💻 Escritorio grande (1600px o más) */
-@media (min-width: 1600px) {
-  
-    /* === Fondo del modal === */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    overflow: hidden; /* bloquea el scroll del body */
+/* Tablets - pantallas medianas */
+@media (max-width: 992px) {
+  main.content {
+    padding: 24px;
   }
- .card-create-task {
-  
-    background-color: #101315;
-    width: 50%;                /* un poco más ancha */
-    max-width: 600px;
-    max-height: 88vh;          /* limita el alto a la pantalla */
-    overflow-y: auto;          /* scroll solo dentro del form */
-    border-radius: 18px;
-    padding: 25px 35px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+
+  .container-template {
     gap: 18px;
-    animation: fadeIn 0.3s ease-in-out;
-    scrollbar-width: thin;
-    scrollbar-color: #0ad2d2 #202224;
-    padding: 20px;
   }
-  /* Botón + */
-.button-condition-add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #202224;
-  color: #0ad2d2;
-  border: none;
-  border-radius: 10px;
-  width: 40px;
-  height: 35px;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-bottom: -0%;
-  margin-left: 110px;
-  position: relative;
-  bottom: 410px;
-}
-}
 
-/* 🖥️ Monitores medianos (entre 1200 y 1599px) */
-@media (max-width: 1599px) and (min-width: 1200px) {
-    /* === Fondo del modal === */
-  .overlay {
-    position: fixed;
-    top: 0;
+  .template {
+    width: 48%;
+    max-width: 46%;
+    min-height: 180px;
+    height: auto;
+    max-height: none;
+  }
+
+  .members-template {
+    width: 90%;
+    margin: 10px auto;
+    position: relative;
     left: 0;
+    top: 0;
+  }
+
+  .button-condition-add {
+    width: 44px;
+    height: 44px;
+    margin: 8px auto;
+    position: relative;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+/* Pequeñas / móviles */
+@media (max-width: 600px) {
+  .tittle-name-project {
+    margin-left: 12px;
+    font-size: 18px;
+    bottom: auto;
+    left: auto;
+  }
+
+  .container-bar-progress {
+    height: 50px;
+    padding: 8px;
+  }
+
+  .button--projects {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    overflow: hidden; /* bloquea el scroll del body */
+    font-size: 15px;
+    height: 45px;
+    align-self: center;
   }
- .card-create-task {
-  
-    background-color: #101315;
-    width: 50%;                /* un poco más ancha */
-    max-width: 600px;
-    max-height: 88vh;          /* limita el alto a la pantalla */
-    overflow-y: auto;          /* scroll solo dentro del form */
-    border-radius: 18px;
-    padding: 25px 35px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
-    display: flex;
+
+  .container-template {
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 18px;
-    animation: fadeIn 0.3s ease-in-out;
-    scrollbar-width: thin;
-    scrollbar-color: #0ad2d2 #202224;
+    align-items: center;
+    gap: 12px;
   }
-  
 
- .conditions-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 150px;
-  overflow-y: auto;
-  padding-right: 6px;
-  margin-bottom: 15px;
-  padding: 30px;
-}
+  .template {
+    width: 92%;
+    max-width: 520px;
+    min-height: 170px;
+    height: auto;
+  }
 
-}
+  .complete-task-template {
+    width: calc(100% - 10px);
+  }
 
-/* 💡 Pantallas pequeñas o laptops chicas (hasta 1199px) */
-@media (max-width: 1199px) {
   .card-create-task {
-    background-color: #101315;
-    width: 85%;
-    max-width: 480px;
-    border-radius: 18px;
-    padding: 25px 30px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    animation: fadeIn 0.3s ease-in-out;
+    width: 90%;
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .title-create-task {
+    font-size: 18px;
+  }
+
+  .button-condition-add,
+  .button-add-in-column {
+    width: 90%;
+    max-width: 380px;
+    height: 44px;
+    border-radius: 10px;
   }
 }
-/* Contenedor del título + botón "+" */
-.subtitle-conditions-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  position: relative;
-  bottom: 211px;
+
+/* Monitores medianos/grandes */
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .container-template {
+    gap: 22px;
+  }
+
+  .template {
+    max-width: 300px;
+    height: 360px;
+  }
+
+  .members-template {
+    width: 300px;
+  }
 }
 
-/* Título */
-.subtitle-conditions {
-  color: #e5e5e5;
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0;  
-}
+/* Escritorio grande (>=1600px) */
+@media (min-width: 1600px) {
+  .card-create-task {
+    width: 50%;
+    max-width: 700px;
+    max-height: 88vh;
+    padding: 25px 35px;
+  }
 
-.title-user-add{
-  font-weight: bold;
-  font-size: 14px;
+  .container-template {
+    gap: 30px;
+  }
+
+  .members-template {
+    width: 380px;
+  }
 }
