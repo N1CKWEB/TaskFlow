@@ -12,6 +12,7 @@ import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { Link, useNavigate } from 'react-router-dom';
+import { apiCrearProyecto, apiListarProyectos } from '../api/api';
 
 export function Home() {
   const navigate = useNavigate();
@@ -29,9 +30,12 @@ export function Home() {
   const [sidebarAbierta, setSidebarAbierta] = useState(false);
   const [proyectos, setProyectos] = useState([]);
   const [nuevoProyecto, setNuevoProyecto] = useState("");
+  const [nombreDueno, setNombreDueno] = useState("");
+  const [nombreLider, setNombreLider] = useState("");
   const [desarrolladores, setDesarrolladores] = useState([""]);
   const [mostrarTodos, setMostrarTodos] = useState(false);
   const [mensajeLogout, setMensajeLogout] = useState("");
+  const [cargando, setCargando] = useState(false);
 
   // 🔄 Cargar datos del usuario al montar
   useEffect(() => {
@@ -42,7 +46,43 @@ export function Home() {
       rol_codigo: localStorage.getItem("rol_codigo") || ""
     };
     setUsuario(usuarioData);
+
+    // Cargar proyectos del backend
+    cargarProyectos();
   }, []);
+
+  // 📥 Cargar proyectos desde el backend
+  const cargarProyectos = async () => {
+    try {
+      setCargando(true);
+      const response = await apiListarProyectos();
+      
+      // Transformar datos del backend al formato del frontend
+      const proyectosFormateados = response.proyectos.map(p => ({
+        id: p.id_proyecto,
+        nombre: p.titulo,
+        siglas: p.titulo
+          .split(" ")
+          .map(palabra => palabra[0].toUpperCase())
+          .join("")
+          .slice(0, 3),
+        color: obtenerColorAleatorio(),
+        descripcion: p.descripcion
+      }));
+      
+      setProyectos(proyectosFormateados);
+    } catch (error) {
+      console.error("Error al cargar proyectos:", error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // 🎨 Obtener color aleatorio para proyecto
+  const obtenerColorAleatorio = () => {
+    const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
+    return colores[Math.floor(Math.random() * colores.length)];
+  };
 
   // ✅ Verificar si puede crear proyectos (Dueño o Líder)
   const puedeCrearProyectos = () => {
@@ -85,7 +125,14 @@ export function Home() {
 
   const handleCerrarFormulario = () => {
     setAnimando("closing");
-    setTimeout(() => setMostrarFormulario(false), 500);
+    setTimeout(() => {
+      setMostrarFormulario(false);
+      // Limpiar formulario
+      setNuevoProyecto("");
+      setNombreDueno("");
+      setNombreLider("");
+      setDesarrolladores([""]);
+    }, 500);
   };
 
   const handleAgregarDesarrollador = () => {
@@ -104,33 +151,61 @@ export function Home() {
     setDesarrolladores(nuevos);
   };
 
-  const handleCrearProyectoFinal = () => {
+  // 🚀 Crear proyecto y enviarlo al backend
+  const handleCrearProyectoFinal = async () => {
     if (nuevoProyecto.trim() === "") {
       alert("Por favor ingresa un nombre para el proyecto");
       return;
     }
 
-    const siglas = nuevoProyecto
-      .split(" ")
-      .map(p => p[0].toUpperCase())
-      .join("")
-      .slice(0, 3);
+    try {
+      setCargando(true);
 
-    const colores = ["#F4A261", "#2A9D8F", "#E76F51", "#264653", "#A7C957", "#3A86FF"];
-    const colorRandom = colores[Math.floor(Math.random() * colores.length)];
+      // Datos a enviar al backend
+      const datosProyecto = {
+        titulo: nuevoProyecto,
+        nombre_dueno: nombreDueno,
+        nombre_lider_tecnico: nombreLider,
+        desarrolladores: desarrolladores.filter(dev => dev.trim() !== "")
+      };
 
-    const nuevo = {
-      id: Date.now(),
-      nombre: nuevoProyecto,
-      siglas,
-      color: colorRandom,
-      desarrolladores
-    };
+      // Enviar al backend
+      const response = await apiCrearProyecto(datosProyecto);
 
-    setProyectos([...proyectos, nuevo]);
-    setNuevoProyecto("");
-    setDesarrolladores([""]);
-    handleCerrarFormulario();
+      // Agregar el nuevo proyecto a la lista
+      const nuevoProyectoObj = {
+        id: response.id_proyecto,
+        nombre: response.titulo,
+        siglas: response.titulo
+          .split(" ")
+          .map(p => p[0].toUpperCase())
+          .join("")
+          .slice(0, 3),
+        color: obtenerColorAleatorio(),
+        nombre_dueno: response.nombre_dueno,
+        nombre_lider_tecnico: response.nombre_lider_tecnico,
+        desarrolladores: response.desarrolladores
+      };
+
+      setProyectos([...proyectos, nuevoProyectoObj]);
+      
+      alert("✅ Proyecto creado exitosamente");
+      handleCerrarFormulario();
+
+    } catch (error) {
+      console.error("Error al crear proyecto:", error);
+      alert(error?.error || "Error al crear el proyecto");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // 🖱️ Hacer clic en un proyecto para ir al dashboard de ese proyecto
+  const handleClickProyecto = (proyecto) => {
+    // Guardar el proyecto actual en localStorage
+    localStorage.setItem("proyecto_actual", JSON.stringify(proyecto));
+    // Navegar al dashboard con el ID del proyecto
+    navigate(`/dashboard-team/${proyecto.id}`);
   };
 
   const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
@@ -194,29 +269,34 @@ export function Home() {
 
         <h3 className='title-actions'>Proyectos</h3>
 
-        <div className="project-grid">
-          {proyectosVisibles.map(proyecto => (
-            <div
-              key={proyecto.id}
-              className="project-card"
-              style={{ backgroundColor: proyecto.color }}
-            >
-              <div className="project-initials">{proyecto.siglas}</div>
-              <p className="project-name">{proyecto.nombre}</p>
-            </div>
-          ))}
+        {cargando ? (
+          <p style={{ textAlign: 'center', color: '#888' }}>Cargando proyectos...</p>
+        ) : (
+          <div className="project-grid">
+            {proyectosVisibles.map(proyecto => (
+              <div
+                key={proyecto.id}
+                className="project-card"
+                style={{ backgroundColor: proyecto.color, cursor: 'pointer' }}
+                onClick={() => handleClickProyecto(proyecto)}
+              >
+                <div className="project-initials">{proyecto.siglas}</div>
+                <p className="project-name">{proyecto.nombre}</p>
+              </div>
+            ))}
 
-          {proyectos.length > 5 && (
-            <div
-              className="project-card ver-mas"
-              onClick={() => setMostrarTodos(!mostrarTodos)}
-            >
-              <p className="project-name">
-                {mostrarTodos ? "Ver menos proyectos..." : "Ver más proyectos..."}
-              </p>
-            </div>
-          )}
-        </div>
+            {proyectos.length > 5 && (
+              <div
+                className="project-card ver-mas"
+                onClick={() => setMostrarTodos(!mostrarTodos)}
+              >
+                <p className="project-name">
+                  {mostrarTodos ? "Ver menos proyectos..." : "Ver más proyectos..."}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="actions">
           {!mostrarFormulario && (
@@ -269,6 +349,8 @@ export function Home() {
                 type="text"
                 className="search-input-members"
                 placeholder="Introduce el nombre del dueño del proyecto"
+                value={nombreDueno}
+                onChange={(e) => setNombreDueno(e.target.value)}
               />
             </div>
 
@@ -278,6 +360,8 @@ export function Home() {
                 type="text"
                 className="search-input-members"
                 placeholder="Introduce el nombre del líder técnico"
+                value={nombreLider}
+                onChange={(e) => setNombreLider(e.target.value)}
               />
             </div>
 
@@ -309,8 +393,14 @@ export function Home() {
             </button>
 
             <div className="buttons-create-close">
-              <button onClick={handleCrearProyectoFinal} className='button-create-project'>
-                <span className='title-user-add'>Crear Proyecto</span>
+              <button 
+                onClick={handleCrearProyectoFinal} 
+                className='button-create-project'
+                disabled={cargando}
+              >
+                <span className='title-user-add'>
+                  {cargando ? "Creando..." : "Crear Proyecto"}
+                </span>
               </button>
 
               <button onClick={handleCerrarFormulario} className='button-close-project'>

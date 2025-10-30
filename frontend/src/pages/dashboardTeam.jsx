@@ -5,16 +5,24 @@ import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import userImg from '../assets/img/img-logo-perfil-user-new.png';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
 import { IoCaretBackCircleOutline } from "react-icons/io5";
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { 
+  apiObtenerProyecto, 
+  apiCrearTarea, 
+  apiListarTareas, 
+  apiActualizarTarea, 
+  apiEliminarTarea 
+} from '../api/api';
 
 export function DashboardTeam() {
   const navigate = useNavigate();
+  const { idProyecto } = useParams(); // Obtener ID del proyecto desde la URL
 
   // 🔐 Obtener datos del usuario logueado
   const [usuario, setUsuario] = useState({
@@ -23,6 +31,11 @@ export function DashboardTeam() {
     rol_id: null,
     rol_codigo: ""
   });
+
+  // 📊 Estado del proyecto actual
+  const [proyectoActual, setProyectoActual] = useState(null);
+  const [miembrosEquipo, setMiembrosEquipo] = useState([]);
+  const [cargandoProyecto, setCargandoProyecto] = useState(true);
 
   const [showForm, setShowForm] = useState(false);
   const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
@@ -53,6 +66,56 @@ export function DashboardTeam() {
     setUsuario(usuarioData);
   }, []);
 
+  // 📥 Cargar proyecto actual desde el backend
+  useEffect(() => {
+    if (idProyecto) {
+      cargarProyecto(idProyecto);
+      cargarTareas(idProyecto);
+    } else {
+      // Si no hay ID en la URL, intentar cargar desde localStorage
+      const proyectoGuardado = localStorage.getItem("proyecto_actual");
+      if (proyectoGuardado) {
+        const proyecto = JSON.parse(proyectoGuardado);
+        setProyectoActual(proyecto);
+        cargarProyecto(proyecto.id);
+        cargarTareas(proyecto.id);
+      }
+    }
+  }, [idProyecto]);
+
+  // 📥 Cargar datos del proyecto desde el backend
+  const cargarProyecto = async (id) => {
+    try {
+      setCargandoProyecto(true);
+      const proyecto = await apiObtenerProyecto(id);
+      
+      setProyectoActual({
+        id: proyecto.id_proyecto,
+        nombre: proyecto.titulo,
+        descripcion: proyecto.descripcion,
+        creador: proyecto.creador
+      });
+
+      setMiembrosEquipo(proyecto.miembros || []);
+      
+    } catch (error) {
+      console.error("Error al cargar proyecto:", error);
+      alert("Error al cargar el proyecto");
+    } finally {
+      setCargandoProyecto(false);
+    }
+  };
+
+  // 📥 Cargar tareas del proyecto desde el backend
+  const cargarTareas = async (id) => {
+    try {
+      const response = await apiListarTareas(id);
+      setTareas(response.tareas || []);
+    } catch (error) {
+      console.error("Error al cargar tareas:", error);
+    }
+  };
+
   // ✅ Verificar si puede crear tareas (Dueño o Líder)
   const puedeCrearTareas = () => {
     return usuario.rol_id === 1 || usuario.rol_id === 2;
@@ -70,6 +133,7 @@ export function DashboardTeam() {
     localStorage.removeItem("nombre_usuario");
     localStorage.removeItem("rol_id");
     localStorage.removeItem("rol_codigo");
+    localStorage.removeItem("proyecto_actual");
     navigate("/login");
   };
 
@@ -131,7 +195,7 @@ export function DashboardTeam() {
   };
 
   // === Crear nueva tarea ===
-  const handleCrearTareaFinal = () => {
+  const handleCrearTareaFinal = async () => {
     if (!puedeCrearTareas()) {
       alert("No tienes permisos para crear tareas");
       return;
@@ -142,19 +206,44 @@ export function DashboardTeam() {
       return;
     }
 
-    const nuevaTarea = {
-      id: Date.now(),
-      nombre,
-      descripcion,
-      prioridad,
-      fechaEntrega,
-      horas,
-      condiciones,
-      status: "To-Do",
-    };
+    if (!proyectoActual) {
+      alert("No hay proyecto seleccionado");
+      return;
+    }
 
-    setTareas([...tareas, nuevaTarea]);
-    handleCerrarForm();
+    try {
+      const datosTarea = {
+        id_proyecto: proyectoActual.id,
+        titulo: nombre,
+        descripcion: descripcion,
+        prioridad: prioridad,
+        fecha_limite: fechaEntrega,
+        horas_estimadas: parseInt(horas) || 0,
+        condiciones_aceptacion: condiciones.filter(c => c.trim() !== "").join(", "),
+        estado: "To-Do"
+      };
+
+      const response = await apiCrearTarea(datosTarea);
+
+      const nuevaTarea = {
+        id: response.id_tarea,
+        nombre: nombre,
+        descripcion: descripcion,
+        prioridad: prioridad,
+        fechaEntrega: fechaEntrega,
+        horas: horas,
+        condiciones: condiciones,
+        status: "To-Do",
+      };
+
+      setTareas([...tareas, nuevaTarea]);
+      alert("✅ Tarea creada exitosamente");
+      handleCerrarForm();
+
+    } catch (error) {
+      console.error("Error al crear tarea:", error);
+      alert(error?.error || "Error al crear la tarea");
+    }
   };
 
   // === Cargar datos si hay tarea seleccionada ===
@@ -198,31 +287,64 @@ export function DashboardTeam() {
   }, [horaInicio]);
 
   // === Editar tarea existente ===
-  const handleEditarTarea = () => {
+  const handleEditarTarea = async () => {
     if (!puedeEditarTareas()) {
       alert("No tienes permisos para editar tareas");
       return;
     }
 
-    setTareas((prev) =>
-      prev.map((t) =>
-        t.id === tareaSeleccionada.id
-          ? { ...t, nombre, descripcion, prioridad, fechaEntrega, horas, condiciones }
-          : t
-      )
-    );
-    handleCerrarForm();
+    try {
+      const datosActualizar = {
+        titulo: nombre,
+        descripcion: descripcion,
+        prioridad: prioridad,
+        fecha_limite: fechaEntrega,
+        horas_estimadas: parseInt(horas) || 0,
+        condiciones_aceptacion: condiciones.filter(c => c.trim() !== "").join(", ")
+      };
+
+      await apiActualizarTarea(tareaSeleccionada.id, datosActualizar);
+
+      setTareas((prev) =>
+        prev.map((t) =>
+          t.id === tareaSeleccionada.id
+            ? { ...t, nombre, descripcion, prioridad, fechaEntrega, horas, condiciones }
+            : t
+        )
+      );
+
+      alert("✅ Tarea actualizada exitosamente");
+      handleCerrarForm();
+
+    } catch (error) {
+      console.error("Error al editar tarea:", error);
+      alert(error?.error || "Error al editar la tarea");
+    }
   };
 
   // === Eliminar tarea ===
-  const handleEliminarTarea = () => {
+  const handleEliminarTarea = async () => {
     if (!puedeEditarTareas()) {
       alert("No tienes permisos para eliminar tareas");
       return;
     }
 
-    setTareas(tareas.filter((t) => t.id !== tareaSeleccionada.id));
-    handleCerrarForm();
+    if (!("¿Estás seguro de que deseas eliminar esta tarea?")) {
+      return;
+    }
+
+    try {
+      await apiEliminarTarea(tareaSeleccionada.id);
+      
+      setTareas(tareas.filter((t) => t.id !== tareaSeleccionada.id));
+      
+      alert("✅ Tarea eliminada exitosamente");
+      handleCerrarForm();
+
+    } catch (error) {
+      console.error("Error al eliminar tarea:", error);
+      alert(error?.error || "Error al eliminar la tarea");
+    }
   };
 
   // === Cerrar y limpiar formulario ===
@@ -251,11 +373,26 @@ export function DashboardTeam() {
 
   const handleDragOver = (e) => e.preventDefault();
 
-  const handleDrop = (e, newStatus) => {
+  const handleDrop = async (e, newStatus) => {
     const id = e.dataTransfer.getData("taskId");
-    setTareas((prev) =>
-      prev.map((t) => (t.id == id ? { ...t, status: newStatus } : t))
-    );
+    
+    try {
+      // Actualizar en el backend
+      await apiActualizarTarea(id, { estado: newStatus });
+      
+      // Actualizar en el estado local
+      setTareas((prev) =>
+        prev.map((t) => (t.id == id ? { ...t, status: newStatus } : t))
+      );
+    } catch (error) {
+      console.error("Error al actualizar estado de tarea:", error);
+    }
+  };
+
+  // === Volver a proyectos ===
+  const handleVolverProyectos = () => {
+    localStorage.removeItem("proyecto_actual");
+    navigate("/");
   };
 
   // === Render columnas ===
@@ -312,6 +449,20 @@ export function DashboardTeam() {
     </div>
   );
 
+  if (cargandoProyecto) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        color: '#fff'
+      }}>
+        <p>Cargando proyecto...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
       {/* === SIDEBAR DESLIZANTE === */}
@@ -356,8 +507,14 @@ export function DashboardTeam() {
       </button>
 
       <main className="content">
-        <IoCaretBackCircleOutline className="icon-project--back" />
-        <h2 className="tittle-name-project">Nombre del proyecto</h2>
+        <IoCaretBackCircleOutline 
+          className="icon-project--back" 
+          onClick={handleVolverProyectos}
+          style={{ cursor: 'pointer' }}
+        />
+        <h2 className="tittle-name-project">
+          {proyectoActual?.nombre || "Nombre del proyecto"}
+        </h2>
 
         <div className="container-bar-progress">
           <div className="barr-progress" />
@@ -365,7 +522,7 @@ export function DashboardTeam() {
           <h2 className="tittle-complete--progress">Completado</h2>
         </div>
 
-        <button className="button--projects">
+        <button className="button--projects" onClick={handleVolverProyectos}>
           <h2>Ver Proyectos</h2>
         </button>
 
@@ -397,9 +554,21 @@ export function DashboardTeam() {
 
           <div className="members-template">
             <h2 className="title-principal-membrers">Miembros del equipo</h2>
-            <img src={userImg} className="user-avatar--members" alt="Avatar" />
-            <h2 className="title-name-user-avatar">{usuario.nombre}</h2>
-            <h3 className="rol-name-user-avatar">{obtenerNombreRol()}</h3>
+            {miembrosEquipo.length > 0 ? (
+              miembrosEquipo.map((miembro, index) => (
+                <div key={index} style={{ marginBottom: '15px' }}>
+                  <img src={userImg} className="user-avatar--members" alt="Avatar" />
+                  <h2 className="title-name-user-avatar">{miembro.nombre_completo}</h2>
+                  <h3 className="rol-name-user-avatar">{miembro.nombre_rol}</h3>
+                </div>
+              ))
+            ) : (
+              <>
+                <img src={userImg} className="user-avatar--members" alt="Avatar" />
+                <h2 className="title-name-user-avatar">{usuario.nombre}</h2>
+                <h3 className="rol-name-user-avatar">{obtenerNombreRol()}</h3>
+              </>
+            )}
           </div>
         </div>
 
