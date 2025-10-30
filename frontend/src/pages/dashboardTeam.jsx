@@ -21,8 +21,10 @@ import {
 } from '../api/api';
 
 export function DashboardTeam() {
+  
   const navigate = useNavigate();
-  const { idProyecto } = useParams(); // Obtener ID del proyecto desde la URL
+  const { idProyecto } = useParams();
+  console.log("Proyecto actual:", idProyecto);
 
   // 🔐 Obtener datos del usuario logueado
   const [usuario, setUsuario] = useState({
@@ -115,16 +117,26 @@ export function DashboardTeam() {
       console.error("Error al cargar tareas:", error);
     }
   };
+const puedeCrearTareas = () => {
+  if (!usuario || !proyectoActual) return false;
 
-  // ✅ Verificar si puede crear tareas (Dueño o Líder)
-  const puedeCrearTareas = () => {
-    return usuario.rol_id === 1 || usuario.rol_id === 2;
-  };
+  const miembro = miembrosEquipo.find(m => m.id == usuario.id); // usar 'id' en lugar de 'id_usuario'
+  if (!miembro) return false;
 
-  // ✅ Verificar si puede editar/eliminar tareas
-  const puedeEditarTareas = () => {
-    return usuario.rol_id === 1 || usuario.rol_id === 2;
-  };
+  return miembro.rol_codigo === "LIDER" || miembro.rol_codigo === "DUENO";
+};
+
+
+// ✅ Verificar si puede editar/eliminar tareas
+const puedeEditarTareas = () => {
+  if (!usuario || !proyectoActual) return false;
+
+  const miembro = miembrosEquipo.find(m => m.id_usuario == usuario.id);
+  if (!miembro) return false;
+
+  return miembro.rol_codigo === "LIDER" || miembro.rol_codigo === "DUENO";
+};
+
 
   // 🚪 Cerrar sesión
   const handleLogout = () => {
@@ -225,7 +237,7 @@ export function DashboardTeam() {
 
       const response = await apiCrearTarea(datosTarea);
 
-      const nuevaTarea = {
+      const nuevaTareaObj = {
         id: response.id_tarea,
         nombre: nombre,
         descripcion: descripcion,
@@ -234,9 +246,16 @@ export function DashboardTeam() {
         horas: horas,
         condiciones: condiciones,
         status: "To-Do",
+        titulo:response.titulo,
+        descripcion:response.descripcion,
+        prioridad:response.prioridad,
+        fecha_limite:response.fecha_limite,
+        horas_estimadas:response.horas_estimadas,
+        condiciones_aceptacion:response.condiciones_aceptacion,
+
       };
 
-      setTareas([...tareas, nuevaTarea]);
+      setTareas([...tareas, nuevaTareaObj]);
       alert("✅ Tarea creada exitosamente");
       handleCerrarForm();
 
@@ -507,11 +526,6 @@ export function DashboardTeam() {
       </button>
 
       <main className="content">
-        <IoCaretBackCircleOutline 
-          className="icon-project--back" 
-          onClick={handleVolverProyectos}
-          style={{ cursor: 'pointer' }}
-        />
         <h2 className="tittle-name-project">
           {proyectoActual?.nombre || "Nombre del proyecto"}
         </h2>
@@ -554,7 +568,7 @@ export function DashboardTeam() {
 
           <div className="members-template">
             <h2 className="title-principal-membrers">Miembros del equipo</h2>
-            {miembrosEquipo.length > 0 ? (
+            {miembrosEquipo.length > 4 ? (
               miembrosEquipo.map((miembro, index) => (
                 <div key={index} style={{ marginBottom: '15px' }}>
                   <img src={userImg} className="user-avatar--members" alt="Avatar" />
@@ -739,4 +753,5 @@ export function DashboardTeam() {
   );
 }
 
+  
 export default DashboardTeam;

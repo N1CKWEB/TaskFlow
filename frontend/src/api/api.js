@@ -158,3 +158,9 @@ export async function apiEliminarTarea(idTarea) {
   if (!r.ok) throw await r.json();
   return r.json();
 }
+
+export async function apiObtenerMiembrosProyecto(idProyecto) {
+  return API.get(`/proyectos/${idProyecto}/miembros`)
+    .then(res => res.data)
+    .catch(err => { throw err });
+}

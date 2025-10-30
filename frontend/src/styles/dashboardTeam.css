@@ -26,10 +26,11 @@ body {
 
 /* título del proyecto: usamos margin en lugar de posiciones absolutas */
 .tittle-name-project {
+  align-items: center;
+  text-align: center;
   position: relative;
-  bottom: 29px;
-  right: 36%;
-
+  right: 45%;
+  bottom: 3%;
   font-weight: bold;
   font-size: 20px;
   color: white;
@@ -100,6 +101,8 @@ main.content {
   border: none;
   align-self: flex-start;
   transition: 0.3s ease;
+  position: relative;
+  left: 29px;
 }
 
 .button--projects:hover {
@@ -690,7 +693,7 @@ main.content {
 
   .members-template {
     width: 380px;
-=======
+  }
 .title-user-add{
   font-weight: bold;
   font-size: 14px;
@@ -930,3 +933,6 @@ html {
 
   }
 }
+}
+
+
