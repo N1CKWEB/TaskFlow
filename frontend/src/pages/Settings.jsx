@@ -1,76 +1,101 @@
 import '../../src/styles/Home.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineTeam } from "react-icons/ai";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import userImg from '../assets/img/img-logo-perfil-user-new.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
 import { SelectionCard } from '../components/selectionCard.jsx';
 
 export function Settings() {
+  const navigate = useNavigate();
 
+  // 🔐 Obtener datos del usuario logueado
+  const [usuario, setUsuario] = useState({
+    id: null,
+    nombre: "",
+    rol_id: null,
+    rol_codigo: ""
+  });
 
+  // 🔄 Cargar datos del usuario al montar el componente
+  useEffect(() => {
+    const usuarioData = {
+      id: localStorage.getItem("usuario_id"),
+      nombre: localStorage.getItem("nombre_usuario") || "Usuario",
+      rol_id: parseInt(localStorage.getItem("rol_id")),
+      rol_codigo: localStorage.getItem("rol_codigo") || ""
+    };
+    setUsuario(usuarioData);
+  }, []);
 
- return (
-<div className="layout">
+  // 🚪 Cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("nombre_usuario");
+    localStorage.removeItem("rol_id");
+    localStorage.removeItem("rol_codigo");
+    navigate("/login");
+  };
 
-  <aside className="sidebar">
-    {/* Logo */}
-    <h2 className="sidebar-title">TaskFlow</h2>
-    <hr className='sidebar-line' />
-    {/* Menú */}
-    <nav className="menu">
-      
-      {/* ✅ Link correcto a dashboardTeam */}
-      
-      <Link to="/" className="menu-link">
-      Proyecto
-      <GoProjectSymlink className='icons' />
-      </Link>
+  // 📋 Obtener nombre del rol en español
+  const obtenerNombreRol = () => {
+    switch(usuario.rol_id) {
+      case 1:
+        return "Dueño del Proyecto";
+      case 2:
+        return "Líder de Proyecto";
+      case 3:
+        return "Desarrollador";
+      default:
+        return "Usuario";
+    }
+  };
 
-      <Link to="/dashboard-team" className='menu-link'>
-      Equipo
-      <AiOutlineTeam className='icons'/>
-      </Link>
+  return (
+    <div className="layout">
+      <aside className="sidebar">
+        <h2 className="sidebar-title">TaskFlow</h2>
+        <hr className='sidebar-line' />
+        <nav className="menu">
+          <Link to="/" className="menu-link">
+            Proyecto
+            <GoProjectSymlink className='icons' />
+          </Link>
 
-      <Link to='/settings'>
-      Ajustes
-      <IoSettings className='icons' />
-      </Link>
-    </nav>
+          <Link to="/dashboard-team" className='menu-link'>
+            Equipo
+            <AiOutlineTeam className='icons'/>
+          </Link>
 
-        {/* Usuario y logout */}
+          <Link to='/settings' className='menu-link'>
+            Ajustes
+            <IoSettings className='icons' />
+          </Link>
+        </nav>
+
         <div className="user-box">
-          <button className="logout-button">
-            {/* Podés agregar un ícono si querés */}
+          <button className="logout-button" onClick={handleLogout}>
             <RiLogoutBoxRLine className='icon-logout'/>
             Cerrar Sesión
           </button>
           <div className="user-info">
-            <img
-              src={userImg} // reemplazá por la foto real
-              className="user-avatar"
-            />
-    
+            <img src={userImg} className="user-avatar" alt="Avatar" />
             <div className="user-texts">
-              <p className="title-user-box">Nombre Usuario</p>
-              <p className="subtitle-user-box">Líder de Proyecto</p>
+              <p className="title-user-box">{usuario.nombre}</p>
+              <p className="subtitle-user-box">{obtenerNombreRol()}</p>
             </div>
           </div>
         </div>
+      </aside>
 
-  </aside>
-  <main className="content">
-         
-      <SelectionCard />
-  </main>
-
-
-</div>
-
+      <main className="content">
+        <SelectionCard />
+      </main>
+    </div>
   );
 }
 
 export default Settings;
-

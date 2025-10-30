@@ -26,7 +26,6 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -39,23 +38,17 @@ export default function Login() {
           return;
         }
 
-        const response = await apiLogin(formData.email, formData.password);
+        const user = await apiLogin(formData.email, formData.password);
 
-        // Acceder correctamente a los datos
-        const { access_token, usuario } = response;
+        // ✅ CRÍTICO: Guardar token y datos del usuario
+        localStorage.setItem("usuario_id", user.id_usuario);
+        localStorage.setItem("nombre_usuario", user.nombre_completo);
+        localStorage.setItem("token", user.token || "authenticated"); // ← ESTO FALTABA
 
-        // Guardar token y datos del usuario
-        localStorage.setItem("usuario_id", usuario.id_usuario);
-        localStorage.setItem("nombre_usuario", usuario.nombre_completo);
-        localStorage.setItem("token", access_token); // ← El token real del backend
+        alert(`Bienvenido, ${user.nombre_completo}`);
 
-        // Mostrar mensaje antes de redirigir
-        setMensaje(`Bienvenido, ${usuario.nombre_completo}`);
-
-        setTimeout(() => {
-          setMensaje("");
-          navigate("/");
-        }, 2000);
+        // Redirigir a la página principal
+        navigate("/");
 
       } else {
         // ------------------ REGISTRO ------------------
@@ -78,8 +71,7 @@ export default function Login() {
         };
 
         await apiRegister(nuevoUsuario);
-        setMensaje("Usuario registrado correctamente. Ahora podés iniciar sesión.");
-        setTimeout(() => setMensaje(""), 3000);
+        alert("Usuario registrado correctamente. Ahora podés iniciar sesión.");
         setActiveTab("login");
       }
     } catch (err) {
