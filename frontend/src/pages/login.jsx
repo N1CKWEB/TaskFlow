@@ -9,6 +9,7 @@ export default function Login() {
     lider: 2,
     desarrollador: 3,
   };
+
   const [mensaje, setMensaje] = useState("");
   const [activeTab, setActiveTab] = useState("login");
   const [formData, setFormData] = useState({
@@ -38,17 +39,22 @@ export default function Login() {
           return;
         }
 
-        const user = await apiLogin(formData.email, formData.password);
+        const response = await apiLogin(formData.email, formData.password);
+        const { access_token, usuario } = response;
 
-        // ✅ CRÍTICO: Guardar token y datos del usuario
-        localStorage.setItem("usuario_id", user.id_usuario);
-        localStorage.setItem("nombre_usuario", user.nombre_completo);
-        localStorage.setItem("token", user.token || "authenticated"); // ← ESTO FALTABA
+        // ✅ CRÍTICO: Guardar token, usuario Y ROL
+        localStorage.setItem("usuario_id", usuario.id_usuario);
+        localStorage.setItem("nombre_usuario", usuario.nombre_completo);
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("rol_id", usuario.rol.id); // ← ROL ID (1, 2 o 3)
+        localStorage.setItem("rol_codigo", usuario.rol.codigo); // ← ROL CODIGO (DUEÑO, LIDER, DESARROLLADOR)
 
-        alert(`Bienvenido, ${user.nombre_completo}`);
-
-        // Redirigir a la página principal
-        navigate("/");
+        setMensaje(`¡Bienvenido, ${usuario.nombre_completo}!`);
+        
+        // Esperar 1 segundo y redirigir
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
 
       } else {
         // ------------------ REGISTRO ------------------
@@ -71,8 +77,14 @@ export default function Login() {
         };
 
         await apiRegister(nuevoUsuario);
-        alert("Usuario registrado correctamente. Ahora podés iniciar sesión.");
-        setActiveTab("login");
+        
+        setMensaje("Usuario registrado correctamente. Ahora podés iniciar sesión.");
+        
+        // Cambiar al tab de login después de 2 segundos
+        setTimeout(() => {
+          setActiveTab("login");
+          setMensaje("");
+        }, 2000);
       }
     } catch (err) {
       console.error(err);

@@ -7,8 +7,12 @@ import userImg from '../assets/img/img-logo-perfil-user-new.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoProjectSymlink } from 'react-icons/go';
 import { SelectionCard } from '../components/selectionCard.jsx';
+import { FaTimes } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export function Settings() {
+    const [sidebarAbierta, setSidebarAbierta] = useState(false);
+  
   const navigate = useNavigate();
 
   // 🔐 Obtener datos del usuario logueado
@@ -55,8 +59,10 @@ export function Settings() {
   };
 
   return (
-    <div className="layout">
-      <aside className="sidebar">
+
+  <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
+      {/* === SIDEBAR DESLIZANTE === */}
+      <aside className={`sidebar ${sidebarAbierta ? 'open' : ''}`}>
         <h2 className="sidebar-title">TaskFlow</h2>
         <hr className='sidebar-line' />
         <nav className="menu">
@@ -90,6 +96,14 @@ export function Settings() {
           </div>
         </div>
       </aside>
+
+{/* === BOTÓN HAMBURGUESA === */}
+      <button
+        className="hamburger-btn"
+        onClick={() => setSidebarAbierta(!sidebarAbierta)}>
+
+        {sidebarAbierta ? <FaTimes/> : <GiHamburgerMenu/> }
+      </button>
 
       <main className="content">
         <SelectionCard />
