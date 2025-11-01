@@ -47,12 +47,6 @@ def _project_role(cur, user_id: int, project_id: int) -> str | None:
     row = cur.fetchone()
     return row["codigo"] if row else None
 
-def _require_membership(cur, user_id: int, project_id: int):
-    role = _project_role(cur, user_id, project_id)
-    if role is None:
-        return None, _json_error("No perteneces a este proyecto", 403)
-    return role, None
-
 def _task_visibility_filter_for_user() -> str:
     """
     Filtro de visibilidad: tareas del usuario (asignado) o de proyectos donde es miembro.
@@ -77,12 +71,14 @@ def crear_tarea(project_id: int):
     Crea una tarea en un proyecto.
     Requiere rol LIDER o ADMIN en el proyecto (o ADMIN global).
     Body requerido: titulo
-    Opcional: descripcion, prioridad (BAJA|MEDIA|ALTA), fecha_inicio, fecha_entrega (YYYY-MM-DD), asignado_a (id_usuario)
+    Opcional: descripcion, prioridad (BAJA|MEDIA|ALTA), fecha_inicio, fecha_limite, asignado_a (id_usuario)
     """
     data = request.get_json() or {}
-    titulo = (data.get("titulo") or "").strip()
+    
+    # ✅ Adaptado para recibir tanto 'titulo' como 'nombre'
+    titulo = (data.get("titulo") or data.get("nombre") or "").strip()
     if not titulo:
-        return _json_error("titulo es requerido", 400)
+        return _json_error("titulo o nombre es requerido", 400)
 
     uid = _now_user_id()
 
@@ -103,6 +99,26 @@ def crear_tarea(project_id: int):
             if not cur.fetchone():
                 return _json_error("El usuario asignado no pertenece al proyecto", 400)
 
+        # ✅ Mapear estado del frontend al backend
+        estado_frontend = data.get("estado", "To-Do")
+        estado_mapa = {
+            "To-Do": "PENDIENTE",
+            "In Progress": "EN_PROGRESO", 
+            "Done": "COMPLETADA",
+            "PENDIENTE": "PENDIENTE",
+            "EN_PROGRESO": "EN_PROGRESO",
+            "COMPLETADA": "COMPLETADA"
+        }
+        estado_bd = estado_mapa.get(estado_frontend, "PENDIENTE")
+
+        # ✅ Mapear prioridad a mayúsculas
+        prioridad = (data.get("prioridad") or "MEDIA").upper()
+        if prioridad not in ("BAJA", "MEDIA", "ALTA"):
+            prioridad = "MEDIA"
+
+        # ✅ Convertir fecha_entrega a fecha_limite
+        fecha_limite = data.get("fecha_limite") or data.get("fecha_entrega")
+
         cur.execute(
             """
             INSERT INTO tareas
@@ -114,16 +130,30 @@ def crear_tarea(project_id: int):
                 project_id,
                 titulo,
                 (data.get("descripcion") or "").strip(),
-                data.get("prioridad") or "MEDIA",
-                "PENDIENTE",
+                prioridad,
+                estado_bd,
                 data.get("fecha_inicio"),
-                data.get("fecha_entrega"),
+                fecha_limite,
                 uid,
                 asignado_a,
             ),
         )
         conn.commit()
-        return jsonify({"mensaje": "Tarea creada", "id_tarea": cur.lastrowid}), 201
+        
+        id_tarea = cur.lastrowid
+
+        # ✅ Devolver la tarea creada en formato esperado por el frontend
+        return jsonify({
+            "mensaje": "Tarea creada",
+            "id_tarea": id_tarea,
+            "titulo": titulo,
+            "descripcion": data.get("descripcion", ""),
+            "prioridad": prioridad,
+            "estado": estado_frontend,  # Devolver en formato frontend
+            "fecha_limite": fecha_limite,
+            "horas_estimadas": data.get("horas_estimadas", 0),
+            "condiciones_aceptacion": data.get("condiciones_aceptacion", "")
+        }), 201
 
     except Exception as e:
         conn.rollback()
@@ -133,7 +163,71 @@ def crear_tarea(project_id: int):
         conn.close()
 
 # ------------------------
-# Listar tareas visibles para el usuario (filtros opcionales)
+# Listar tareas de un proyecto específico
+# ------------------------
+@task_bp.route("/proyectos/<int:project_id>/tareas", methods=["GET"])
+@jwt_required()
+def listar_tareas_proyecto(project_id: int):
+    """
+    Lista todas las tareas de un proyecto específico.
+    El usuario debe ser miembro del proyecto.
+    """
+    uid = _now_user_id()
+    
+    conn = get_connection()
+    cur = conn.cursor(dictionary=True)
+    try:
+        # Verificar que el usuario es miembro del proyecto
+        role = _project_role(cur, uid, project_id)
+        if not role:
+            return _json_error("No tienes acceso a este proyecto", 403)
+
+        cur.execute("""
+            SELECT 
+                t.id_tarea as id,
+                t.titulo,
+                t.descripcion,
+                t.prioridad,
+                t.estado,
+                t.fecha_inicio,
+                t.fecha_entrega as fecha_limite,
+                t.asignado_a,
+                t.creado_por,
+                t.fecha_creacion,
+                t.fecha_actualizacion,
+                u_asignado.nombre_completo as nombre_asignado,
+                u_creador.nombre_completo as nombre_creador
+            FROM tareas t
+            LEFT JOIN usuarios u_asignado ON t.asignado_a = u_asignado.id_usuario
+            LEFT JOIN usuarios u_creador ON t.creado_por = u_creador.id_usuario
+            WHERE t.id_proyecto = %s
+            ORDER BY t.fecha_creacion DESC
+        """, (project_id,))
+        
+        tareas = cur.fetchall() or []
+        
+        # ✅ Mapear estado de BD a formato frontend
+        estado_mapa = {
+            "PENDIENTE": "To-Do",
+            "EN_PROGRESO": "In Progress",
+            "COMPLETADA": "Done"
+        }
+        
+        for tarea in tareas:
+            tarea['status'] = estado_mapa.get(tarea['estado'], 'To-Do')
+            tarea['nombre'] = tarea['titulo']  # Alias para compatibilidad
+            tarea['fechaEntrega'] = tarea['fecha_limite']
+            
+        return jsonify({"tareas": tareas}), 200
+
+    except Exception as e:
+        return _json_error(str(e), 500)
+    finally:
+        cur.close()
+        conn.close()
+
+# ------------------------
+# Listar todas las tareas visibles para el usuario
 # ------------------------
 @task_bp.route("/tareas", methods=["GET"])
 @jwt_required()
@@ -219,7 +313,6 @@ def actualizar_tarea(task_id: int):
     """
     Actualiza campos de una tarea.
     Permisos: LIDER/ADMIN del proyecto o ADMIN global.
-    USUARIO no puede editar (salvo completar con endpoint dedicado).
     """
     data = request.get_json() or {}
     uid = _now_user_id()
@@ -250,19 +343,26 @@ def actualizar_tarea(task_id: int):
 
         if "prioridad" in data:
             updates.append("prioridad = %s")
-            values.append(data["prioridad"])
+            values.append(data["prioridad"].upper())
 
         if "estado" in data:
+            # ✅ Mapear estado frontend a BD
+            estado_mapa = {
+                "To-Do": "PENDIENTE",
+                "In Progress": "EN_PROGRESO",
+                "Done": "COMPLETADA"
+            }
+            estado_bd = estado_mapa.get(data["estado"], data["estado"])
             updates.append("estado = %s")
-            values.append(data["estado"])
+            values.append(estado_bd)
 
         if "fecha_inicio" in data:
             updates.append("fecha_inicio = %s")
             values.append(data["fecha_inicio"])
 
-        if "fecha_entrega" in data:
+        if "fecha_limite" in data or "fecha_entrega" in data:
             updates.append("fecha_entrega = %s")
-            values.append(data["fecha_entrega"])
+            values.append(data.get("fecha_limite") or data.get("fecha_entrega"))
 
         if "asignado_a" in data:
             asignado_a = data["asignado_a"]

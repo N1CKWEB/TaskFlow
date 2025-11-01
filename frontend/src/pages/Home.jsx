@@ -37,6 +37,7 @@ export function Home() {
   const [mensajeLogout, setMensajeLogout] = useState("");
   const [cargando, setCargando] = useState(false);
 
+
   // 🔄 Cargar datos del usuario al montar
   useEffect(() => {
     const usuarioData = {
@@ -201,12 +202,13 @@ export function Home() {
   };
 
   // 🖱️ Hacer clic en un proyecto para ir al dashboard de ese proyecto
-  const handleClickProyecto = (proyecto) => {
-    // Guardar el proyecto actual en localStorage
-    localStorage.setItem("proyecto_actual", JSON.stringify(proyecto));
-    // Navegar al dashboard con el ID del proyecto
-    navigate(`/dashboard-team/${proyecto.id}`);
-  };
+
+    const handleClickProyecto = (proyecto) => {
+  localStorage.setItem("proyecto_actual", JSON.stringify(proyecto));
+  navigate(`/dashboardTeam/${proyecto.id}`);
+
+};
+
 
   const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
 

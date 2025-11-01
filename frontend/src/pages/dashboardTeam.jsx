@@ -21,8 +21,10 @@ import {
 } from '../api/api';
 
 export function DashboardTeam() {
+  
   const navigate = useNavigate();
-  const { idProyecto } = useParams(); // Obtener ID del proyecto desde la URL
+  const { idProyecto } = useParams();
+  console.log("Proyecto actual:", idProyecto);
 
   // 🔐 Obtener datos del usuario logueado
   const [usuario, setUsuario] = useState({
@@ -58,11 +60,12 @@ export function DashboardTeam() {
   // 🔄 Cargar datos del usuario al montar el componente
   useEffect(() => {
     const usuarioData = {
-      id: localStorage.getItem("usuario_id"),
+      id: parseInt(localStorage.getItem("usuario_id")),
       nombre: localStorage.getItem("nombre_usuario") || "Usuario",
       rol_id: parseInt(localStorage.getItem("rol_id")),
       rol_codigo: localStorage.getItem("rol_codigo") || ""
     };
+    console.log("Usuario cargado:", usuarioData);
     setUsuario(usuarioData);
   }, []);
 
@@ -89,6 +92,9 @@ export function DashboardTeam() {
       setCargandoProyecto(true);
       const proyecto = await apiObtenerProyecto(id);
       
+      console.log("Proyecto cargado:", proyecto);
+      console.log("Miembros del equipo:", proyecto.miembros);
+      
       setProyectoActual({
         id: proyecto.id_proyecto,
         nombre: proyecto.titulo,
@@ -106,15 +112,17 @@ export function DashboardTeam() {
     }
   };
 
-  // 📥 Cargar tareas del proyecto desde el backend
-  const cargarTareas = async (id) => {
-    try {
-      const response = await apiListarTareas(id);
-      setTareas(response.tareas || []);
-    } catch (error) {
-      console.error("Error al cargar tareas:", error);
-    }
-  };
+  
+  // 🔥 Cargar tareas del proyecto desde el backend
+const cargarTareas = async (id) => {
+  try {
+    const response = await apiListarTareas(id); // Usa el ID del proyecto
+    console.log("Tareas cargadas:", response.tareas);
+    setTareas(response.tareas || []);
+  } catch (error) {
+    console.error("Error al cargar tareas:", error);
+  }
+};
 
   // ✅ Verificar si puede crear tareas (Dueño o Líder)
   const puedeCrearTareas = () => {
@@ -194,20 +202,24 @@ export function DashboardTeam() {
     }
   };
 
-  // === Crear nueva tarea ===
+  // === CORREGIDO: Crear nueva tarea ===
   const handleCrearTareaFinal = async () => {
+    console.log("Intentando crear tarea...");
+    console.log("Usuario:", usuario);
+    console.log("Puede crear tareas:", puedeCrearTareas());
+    
     if (!puedeCrearTareas()) {
-      alert("No tienes permisos para crear tareas");
+      alert("❌ No tienes permisos para crear tareas. Solo el Dueño y el Líder pueden crear tareas.");
       return;
     }
 
     if (!nombre || !prioridad || !fechaEntrega) {
-      alert("Por favor completa los campos obligatorios");
+      alert("⚠️ Por favor completa los campos obligatorios: Nombre, Prioridad y Fecha de Entrega");
       return;
     }
 
     if (!proyectoActual) {
-      alert("No hay proyecto seleccionado");
+      alert("❌ No hay proyecto seleccionado");
       return;
     }
 
@@ -223,42 +235,59 @@ export function DashboardTeam() {
         estado: "To-Do"
       };
 
+      console.log("Enviando tarea:", datosTarea);
       const response = await apiCrearTarea(datosTarea);
+      console.log("Respuesta del servidor:", response);
 
-      const nuevaTarea = {
+      const nuevaTareaObj = {
         id: response.id_tarea,
-        nombre: nombre,
-        descripcion: descripcion,
-        prioridad: prioridad,
-        fechaEntrega: fechaEntrega,
-        horas: horas,
-        condiciones: condiciones,
-        status: "To-Do",
+        nombre: response.titulo || nombre,
+        descripcion: response.descripcion || descripcion,
+        prioridad: response.prioridad || prioridad,
+        fechaEntrega: response.fecha_limite || fechaEntrega,
+        horas: response.horas_estimadas || horas,
+        condiciones: response.condiciones_aceptacion || condiciones,
+        status: response.estado || "To-Do",
+        titulo: response.titulo,
+        fecha_limite: response.fecha_limite,
+        horas_estimadas: response.horas_estimadas,
+        condiciones_aceptacion: response.condiciones_aceptacion,
+        estado: response.estado
       };
 
-      setTareas([...tareas, nuevaTarea]);
+      setTareas([...tareas, nuevaTareaObj]);
       alert("✅ Tarea creada exitosamente");
       handleCerrarForm();
 
     } catch (error) {
       console.error("Error al crear tarea:", error);
-      alert(error?.error || "Error al crear la tarea");
+      alert(error?.error || error?.message || "❌ Error al crear la tarea");
     }
   };
 
   // === Cargar datos si hay tarea seleccionada ===
   useEffect(() => {
     if (tareaSeleccionada) {
-      setNombre(tareaSeleccionada.nombre);
+      setNombre(tareaSeleccionada.nombre || tareaSeleccionada.titulo);
       setDescripcion(tareaSeleccionada.descripcion);
       setPrioridad(tareaSeleccionada.prioridad);
-      setFechaEntrega(tareaSeleccionada.fechaEntrega);
-      setHoras(tareaSeleccionada.horas);
-      setCondiciones(
-        Array.isArray(tareaSeleccionada.condiciones)
-          ? tareaSeleccionada.condiciones
-          : tareaSeleccionada.condiciones.split(',').map((c) => c.trim())
-      );
+      setFechaEntrega(tareaSeleccionada.fechaEntrega || tareaSeleccionada.fecha_limite);
+      setHoras(tareaSeleccionada.horas || tareaSeleccionada.horas_estimadas);
+      
+      // Manejar condiciones
+      let condicionesArray = [""];
+      if (tareaSeleccionada.condiciones) {
+        if (Array.isArray(tareaSeleccionada.condiciones)) {
+          condicionesArray = tareaSeleccionada.condiciones;
+        } else if (typeof tareaSeleccionada.condiciones === 'string') {
+          condicionesArray = tareaSeleccionada.condiciones.split(',').map(c => c.trim());
+        }
+      } else if (tareaSeleccionada.condiciones_aceptacion) {
+        if (typeof tareaSeleccionada.condiciones_aceptacion === 'string') {
+          condicionesArray = tareaSeleccionada.condiciones_aceptacion.split(',').map(c => c.trim());
+        }
+      }
+      setCondiciones(condicionesArray);
 
       setHoraInicio(Date.now());
     }
@@ -289,7 +318,7 @@ export function DashboardTeam() {
   // === Editar tarea existente ===
   const handleEditarTarea = async () => {
     if (!puedeEditarTareas()) {
-      alert("No tienes permisos para editar tareas");
+      alert("❌ No tienes permisos para editar tareas");
       return;
     }
 
@@ -318,18 +347,18 @@ export function DashboardTeam() {
 
     } catch (error) {
       console.error("Error al editar tarea:", error);
-      alert(error?.error || "Error al editar la tarea");
+      alert(error?.error || "❌ Error al editar la tarea");
     }
   };
 
-  // === Eliminar tarea ===
+  // === CORREGIDO: Eliminar tarea ===
   const handleEliminarTarea = async () => {
     if (!puedeEditarTareas()) {
-      alert("No tienes permisos para eliminar tareas");
+      alert("❌ No tienes permisos para eliminar tareas");
       return;
     }
 
-    if (!("¿Estás seguro de que deseas eliminar esta tarea?")) {
+    if (!window.confirm("⚠️ ¿Estás seguro de que deseas eliminar esta tarea?")) {
       return;
     }
 
@@ -343,7 +372,7 @@ export function DashboardTeam() {
 
     } catch (error) {
       console.error("Error al eliminar tarea:", error);
-      alert(error?.error || "Error al eliminar la tarea");
+      alert(error?.error || "❌ Error al eliminar la tarea");
     }
   };
 
@@ -382,7 +411,7 @@ export function DashboardTeam() {
       
       // Actualizar en el estado local
       setTareas((prev) =>
-        prev.map((t) => (t.id == id ? { ...t, status: newStatus } : t))
+        prev.map((t) => (t.id == id ? { ...t, status: newStatus, estado: newStatus } : t))
       );
     } catch (error) {
       console.error("Error al actualizar estado de tarea:", error);
@@ -407,15 +436,20 @@ export function DashboardTeam() {
       {/* ✅ Solo mostrar botón si tiene permisos */}
       {allowCreate && puedeCrearTareas() && (
         <IoIosAddCircle
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            console.log("Abriendo formulario de creación");
+            setTareaSeleccionada(null);
+            setShowForm(true);
+          }}
           className="icon-add"
+          style={{ cursor: 'pointer' }}
         />
       )}
 
       <div className={`template-color-${status.replace(" ", "-").toLowerCase()}`} />
 
       {tareas
-        .filter((t) => t.status === status)
+        .filter((t) => (t.status || t.estado) === status)
         .map((t) => (
           <div
             key={t.id}
@@ -427,10 +461,12 @@ export function DashboardTeam() {
             }}
             onDragStart={(e) => handleDragStart(e, t.id)}
           >
-            <h3 className="title-complete-task-template">{t.nombre}</h3>
+            <h3 className="title-complete-task-template">
+              {t.nombre || t.titulo}
+            </h3>
             <h4 className="date-complete-task-template">
               <FaCalendarAlt className="icon-calendar-task--complete" />{" "}
-              {t.fechaEntrega}
+              {t.fechaEntrega || t.fecha_limite}
             </h4>
             <h4
               className="priority-complete-task-template"
@@ -462,6 +498,7 @@ export function DashboardTeam() {
       </div>
     );
   }
+
 
   return (
     <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
