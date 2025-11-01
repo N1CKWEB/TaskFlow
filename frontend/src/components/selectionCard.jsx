@@ -129,17 +129,6 @@ export function SelectionCard() {
       </Box>
 
       {/* Selector de color */}
-      <div className="color-section">
-        <h3>Color de la Barra de Navegación</h3>
-        <input
-          type="color"
-          name="navColor"
-          value={sidebarColor}
-          onChange={handleColorChange}
-          className="color-picker"
-        />
-      </div>
-
       <button className="save-button" id='' >Guardar Cambios</button>
     </div>
   );
