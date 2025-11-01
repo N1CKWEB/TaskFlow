@@ -11,7 +11,7 @@ function App() {
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard-team" element={<DashboardTeam />} />
+        <Route path="/dashboardTeam/:idProyecto" element={<DashboardTeam />} />
         <Route path="/settings" element={<Setting />} />
         <Route path="/tareas" element={<GestorTareas />} />
       </Route>

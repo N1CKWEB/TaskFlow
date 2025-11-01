@@ -9,6 +9,7 @@ export default function Login() {
     lider: 2,
     desarrollador: 3,
   };
+
   const [mensaje, setMensaje] = useState("");
   const [activeTab, setActiveTab] = useState("login");
   const [formData, setFormData] = useState({
@@ -26,7 +27,6 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -40,22 +40,21 @@ export default function Login() {
         }
 
         const response = await apiLogin(formData.email, formData.password);
-
-        // Acceder correctamente a los datos
         const { access_token, usuario } = response;
 
-        // Guardar token y datos del usuario
+        // ✅ CRÍTICO: Guardar token, usuario Y ROL
         localStorage.setItem("usuario_id", usuario.id_usuario);
         localStorage.setItem("nombre_usuario", usuario.nombre_completo);
-        localStorage.setItem("token", access_token); // ← El token real del backend
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("rol_id", usuario.rol.id); // ← ROL ID (1, 2 o 3)
+        localStorage.setItem("rol_codigo", usuario.rol.codigo); // ← ROL CODIGO (DUEÑO, LIDER, DESARROLLADOR)
 
-        // Mostrar mensaje antes de redirigir
-        setMensaje(`Bienvenido, ${usuario.nombre_completo}`);
-
+        setMensaje(`¡Bienvenido, ${usuario.nombre_completo}!`);
+        
+        // Esperar 1 segundo y redirigir
         setTimeout(() => {
-          setMensaje("");
           navigate("/");
-        }, 2000);
+        }, 1000);
 
       } else {
         // ------------------ REGISTRO ------------------
@@ -78,9 +77,14 @@ export default function Login() {
         };
 
         await apiRegister(nuevoUsuario);
+        
         setMensaje("Usuario registrado correctamente. Ahora podés iniciar sesión.");
-        setTimeout(() => setMensaje(""), 3000);
-        setActiveTab("login");
+        
+        // Cambiar al tab de login después de 2 segundos
+        setTimeout(() => {
+          setActiveTab("login");
+          setMensaje("");
+        }, 2000);
       }
     } catch (err) {
       console.error(err);
