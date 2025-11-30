@@ -71,10 +71,7 @@ export function Settings() {
             <GoProjectSymlink className='icons' />
           </Link>
 
-          <Link to="/dashboard-team" className='menu-link'>
-            Equipo
-            <AiOutlineTeam className='icons'/>
-          </Link>
+   
 
           <Link to='/settings' className='menu-link'>
             Ajustes

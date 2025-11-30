@@ -92,37 +92,58 @@ def crear_proyecto():
 @jwt_required()
 def mis_proyectos():
     """
-    Lista todos los proyectos donde el usuario es miembro.
-    Cualquier usuario puede ver sus proyectos.
+    Lista todos los proyectos del usuario.
+    Ahora también permite búsqueda por título: ?search=texto
     """
-    user_id = int(get_jwt_identity())  # ✅ Convertir a int
+    user_id = int(get_jwt_identity())  
+    search = request.args.get("search", "").strip().lower()
+
     conn = get_connection()
     cur = conn.cursor(dictionary=True)
-    
-    cur.execute("""
-        SELECT 
-            p.id_proyecto, 
-            p.nombre AS titulo,
-            p.descripcion,
-            p.fecha_creacion,
-            r.codigo AS mi_rol,
-            r.nombre AS nombre_rol
-        FROM proyectos p
-        JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
-        JOIN roles r ON r.id_rol = pm.id_rol
-        WHERE pm.id_usuario = %s
-        ORDER BY p.fecha_creacion DESC
-    """, (user_id,))
-    
+
+    if search:
+        # 🔍 Filtrado por título
+        cur.execute("""
+            SELECT 
+                p.id_proyecto, 
+                p.nombre AS titulo,
+                p.descripcion,
+                p.fecha_creacion,
+                r.codigo AS mi_rol,
+                r.nombre AS nombre_rol
+            FROM proyectos p
+            JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
+            JOIN roles r ON r.id_rol = pm.id_rol
+            WHERE pm.id_usuario = %s
+            AND LOWER(p.nombre) LIKE %s
+            ORDER BY p.fecha_creacion DESC
+        """, (user_id, f"%{search}%"))
+    else:
+        # 🔎 Sin filtro → trae todos como antes
+        cur.execute("""
+            SELECT 
+                p.id_proyecto, 
+                p.nombre AS titulo,
+                p.descripcion,
+                p.fecha_creacion,
+                r.codigo AS mi_rol,
+                r.nombre AS nombre_rol
+            FROM proyectos p
+            JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
+            JOIN roles r ON r.id_rol = pm.id_rol
+            WHERE pm.id_usuario = %s
+            ORDER BY p.fecha_creacion DESC
+        """, (user_id,))
+
     proyectos = cur.fetchall()
+
     cur.close()
     conn.close()
-    
+
     return jsonify({
         "total": len(proyectos),
         "proyectos": proyectos
     }), 200
-
 
 @project_bp.route('/proyectos/<int:id_proyecto>', methods=['GET'])
 @jwt_required()
@@ -252,6 +273,10 @@ def agregar_miembro(id_proyecto):
     finally:
         cur.close()
         conn.close()
+        
+        
+
+@project_bp.route('/tareas/<int>id>/horas')        
 
 
 @project_bp.route('/usuarios/buscar', methods=['GET'])
@@ -287,3 +312,4 @@ def buscar_usuarios():
     conn.close()
     
     return jsonify(usuarios), 200
+
