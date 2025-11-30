@@ -20,6 +20,7 @@ import {
   apiEliminarTarea 
 } from '../api/api';
 
+
 export function DashboardTeam() {
   
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ export function DashboardTeam() {
   const [prioridad, setPrioridad] = useState("");
   const [fechaEntrega, setFechaEntrega] = useState("");
   const [horas, setHoras] = useState("");
+  const [horasEstimadas, setHorasEstimadas] = useState("");
   const [condiciones, setCondiciones] = useState([""]);
 
   // 🕓 Control de horas reales trabajadas
@@ -230,7 +232,7 @@ const cargarTareas = async (id) => {
         descripcion: descripcion,
         prioridad: prioridad,
         fecha_limite: fechaEntrega,
-        horas_estimadas: parseInt(horas) || 0,
+        horas_estimadas: parseInt(horasEstimadas) || 0,
         condiciones_aceptacion: condiciones.filter(c => c.trim() !== "").join(", "),
         estado: "To-Do"
       };
@@ -272,7 +274,7 @@ const cargarTareas = async (id) => {
       setDescripcion(tareaSeleccionada.descripcion);
       setPrioridad(tareaSeleccionada.prioridad);
       setFechaEntrega(tareaSeleccionada.fechaEntrega || tareaSeleccionada.fecha_limite);
-      setHoras(tareaSeleccionada.horas || tareaSeleccionada.horas_estimadas);
+      setHorasEstimadas(tareaSeleccionada.horas || tareaSeleccionada.horas_estimadas);
       
       // Manejar condiciones
       let condicionesArray = [""];
@@ -328,7 +330,7 @@ const cargarTareas = async (id) => {
         descripcion: descripcion,
         prioridad: prioridad,
         fecha_limite: fechaEntrega,
-        horas_estimadas: parseInt(horas) || 0,
+        horas_estimadas: parseInt(horasEstimadas) || 0,
         condiciones_aceptacion: condiciones.filter(c => c.trim() !== "").join(", ")
       };
 
@@ -337,7 +339,7 @@ const cargarTareas = async (id) => {
       setTareas((prev) =>
         prev.map((t) =>
           t.id === tareaSeleccionada.id
-            ? { ...t, nombre, descripcion, prioridad, fechaEntrega, horas, condiciones }
+            ? { ...t, nombre, descripcion, prioridad, fechaEntrega, horasEstimadas, condiciones }
             : t
         )
       );
@@ -391,7 +393,7 @@ const cargarTareas = async (id) => {
     setDescripcion("");
     setPrioridad("");
     setFechaEntrega("");
-    setHoras("");
+    setHorasEstimadas("");
     setCondiciones([""]);
   };
 
@@ -444,6 +446,7 @@ const cargarTareas = async (id) => {
           className="icon-add"
           style={{ cursor: 'pointer' }}
         />
+        
       )}
 
       <div className={`template-color-${status.replace(" ", "-").toLowerCase()}`} />
@@ -485,23 +488,13 @@ const cargarTareas = async (id) => {
     </div>
   );
 
-  if (cargandoProyecto) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        color: '#fff'
-      }}>
-        <p>Cargando proyecto...</p>
-      </div>
-    );
-  }
+
 
 
   return (
     <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
+      
+
       {/* === SIDEBAR DESLIZANTE === */}
       <aside className={`sidebar ${sidebarAbierta ? 'open' : ''}`}>
         <h2 className="sidebar-title">TaskFlow</h2>
@@ -511,10 +504,7 @@ const cargarTareas = async (id) => {
             Proyecto
             <GoProjectSymlink className="icons" />
           </Link>
-          <Link to="/dashboard-team" className="menu-link">
-            Equipo
-            <AiOutlineTeam className="icons" />
-          </Link>
+ 
           <Link to="/settings" className="menu-link">
             Ajustes
             <IoSettings className="icons" />
@@ -548,7 +538,7 @@ const cargarTareas = async (id) => {
           className="icon-project--back" 
           onClick={handleVolverProyectos}
           style={{ cursor: 'pointer' }}
-        />
+          />
         <h2 className="tittle-name-project">
           {proyectoActual?.nombre || "Nombre del proyecto"}
         </h2>
@@ -627,7 +617,7 @@ const cargarTareas = async (id) => {
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 disabled={tareaSeleccionada && !puedeEditarTareas()}
-              />
+                />
 
               <textarea
                 className="textarea-task"
@@ -635,14 +625,14 @@ const cargarTareas = async (id) => {
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
                 disabled={tareaSeleccionada && !puedeEditarTareas()}
-              />
+                />
 
               <select
                 className="select-priority"
                 value={prioridad}
                 onChange={(e) => setPrioridad(e.target.value)}
                 disabled={tareaSeleccionada && !puedeEditarTareas()}
-              >
+                >
                 <option disabled value="">
                   Prioridad
                 </option>
@@ -657,8 +647,30 @@ const cargarTareas = async (id) => {
                 value={fechaEntrega}
                 onChange={(e) => setFechaEntrega(e.target.value)}
                 disabled={tareaSeleccionada && !puedeEditarTareas()}
-              />
+                />
 
+              <input
+                type="number"
+                className="input-hours"
+                placeholder="Horas estimadas"
+                value={horasEstimadas}
+                min={1}
+                step={1}
+                onChange={(e) => {
+                  const valor = parseInt(e.target.value, 10);
+                  if (isNaN(valor) || valor < 1) {
+                    setHorasEstimadas(1);
+                  } else {
+                    setHorasEstimadas(valor);
+                  }
+                }}
+                onBlur={() => {
+                  if (horasEstimadas < 1) setHoras(1);
+                }}
+                disabled={tareaSeleccionada && !puedeEditarTareas()}
+                required
+                />
+        
               <input
                 type="number"
                 className="input-hours"
@@ -679,7 +691,7 @@ const cargarTareas = async (id) => {
                 }}
                 disabled={tareaSeleccionada && !puedeEditarTareas()}
                 required
-              />
+                />
 
               <h3 className="subtitle-conditions">Condiciones de aceptación</h3>
 
@@ -697,15 +709,15 @@ const cargarTareas = async (id) => {
                         setCondiciones(nuevas);
                       }}
                       disabled={tareaSeleccionada && !puedeEditarTareas()}
-                    />
+                      />
                     {condiciones.length > 1 && puedeEditarTareas() && (
                       <button
-                        type="button"
-                        className="delete-dev-btn"
-                        onClick={() => {
-                          const nuevas = condiciones.filter((_, i) => i !== index);
-                          setCondiciones(nuevas);
-                        }}
+                      type="button"
+                      className="delete-dev-btn"
+                      onClick={() => {
+                        const nuevas = condiciones.filter((_, i) => i !== index);
+                        setCondiciones(nuevas);
+                      }}
                       >
                         ✕
                       </button>
@@ -716,10 +728,14 @@ const cargarTareas = async (id) => {
 
               <div className="horas-reales-container">
                 <p style={{ color: "#e5e5e5", marginBottom: "8px" }}>
-                  ⏱️ Horas programadas: <strong>{horas || 0}</strong> h
+                  ⏱ Horas estimadas: <strong>{horasEstimadas || 0}</strong> h
+                </p>
+                
+                <p style={{ color: "#e5e5e5", marginBottom: "8px" }}>
+                  👨‍💻 Horas programadas: <strong>{horas || 0}</strong> h
                 </p>
                 <p style={{ color: "#00ff88" }}>
-                  🔄 Horas en tiempo real: <strong>{horasTrabajadas.toFixed(2)}</strong> h
+                  ⌚ Horas en tiempo real: <strong>{horasTrabajadas.toFixed(2)}</strong> h
                 </p>
               </div>
 
@@ -773,7 +789,7 @@ const cargarTareas = async (id) => {
         )}
       </main>
     </div>
-  );
+ )
 }
 
 export default DashboardTeam;

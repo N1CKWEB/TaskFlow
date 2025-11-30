@@ -12,10 +12,12 @@ import { GrUserManager } from "react-icons/gr";
 import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { Link, useNavigate } from 'react-router-dom';
-import { apiCrearProyecto, apiListarProyectos } from '../api/api';
+import { apiCrearProyecto, apiListarProyectos,apiBuscarProyectos } from '../api/api';
 
 export function Home() {
   const navigate = useNavigate();
+
+  const [search,setSearch] = useState("");
 
   // 🔐 Estados del usuario
   const [usuario, setUsuario] = useState({
@@ -212,6 +214,54 @@ export function Home() {
 
   const proyectosVisibles = mostrarTodos ? proyectos : proyectos.slice(0, 5);
 
+  useEffect(() => {
+  const buscar = async () => {
+    try {
+      if (!search.trim()) {
+        const data = await apiListarProyectos();
+        
+        const proyectosFormateados = data.proyectos.map(p => ({
+          id: p.id_proyecto,
+          nombre: p.titulo,
+          descripcion: p.descripcion,
+          siglas: p.titulo
+            .split(" ")
+            .map(x => x[0].toUpperCase())
+            .join("")
+            .slice(0, 3),
+          color: obtenerColorAleatorio()
+        }));
+
+        setProyectos(proyectosFormateados);
+        return;
+      }
+
+      const data = await apiBuscarProyectos(search);
+
+      const proyectosFormateados = data.proyectos.map(p => ({
+        id: p.id_proyecto,
+        nombre: p.titulo,
+        descripcion: p.descripcion,
+        siglas: p.titulo
+          .split(" ")
+          .map(x => x[0].toUpperCase())
+          .join("")
+          .slice(0, 3),
+        color: obtenerColorAleatorio()
+      }));
+
+      setProyectos(proyectosFormateados);
+
+    } catch (e) {
+      console.error("Error:", e);
+    }
+  };
+
+  const t = setTimeout(buscar, 300);
+  return () => clearTimeout(t);
+}, [search]);
+ 
+
   return (
     <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
       {/* === SIDEBAR === */}
@@ -223,10 +273,7 @@ export function Home() {
             Proyecto
             <GoProjectSymlink className='icons' />
           </Link>
-          <Link to="/dashboard-team" className='menu-link'>
-            Equipo
-            <AiOutlineTeam className='icons' />
-          </Link>
+
           <Link to='/settings' className='menu-link'>
             Ajustes
             <IoSettings className='icons' />
@@ -262,10 +309,12 @@ export function Home() {
       <main className="content">
         <h1 className="title">Hola {usuario.nombre}</h1>
         <p className="subtitle">¡Bienvenido de nuevo al espacio de trabajo, te extrañamos!</p>
-
+ 
         <input
           type="text"
           className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar proyecto...."
         />
 

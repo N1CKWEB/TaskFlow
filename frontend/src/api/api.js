@@ -59,6 +59,21 @@ export async function apiListarProyectos() {
   return r.json();
 }
 
+export async function apiBuscarProyectos(search) {
+  const token = localStorage.getItem("token");
+
+  const r = await fetch(`${API}/proyectos?search=${encodeURIComponent(search)}`, {
+    method: 'GET',
+    headers: { 
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  if (!r.ok) throw await r.json();
+  return r.json();
+}
+
+
 // ---- OBTENER DETALLES DE UN PROYECTO ----
 export async function apiObtenerProyecto(idProyecto) {
   const token = localStorage.getItem("token");

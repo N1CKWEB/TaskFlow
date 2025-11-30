@@ -92,37 +92,58 @@ def crear_proyecto():
 @jwt_required()
 def mis_proyectos():
     """
-    Lista todos los proyectos donde el usuario es miembro.
-    Cualquier usuario puede ver sus proyectos.
+    Lista todos los proyectos del usuario.
+    Ahora también permite búsqueda por título: ?search=texto
     """
-    user_id = int(get_jwt_identity())  # ✅ Convertir a int
+    user_id = int(get_jwt_identity())  
+    search = request.args.get("search", "").strip().lower()
+
     conn = get_connection()
     cur = conn.cursor(dictionary=True)
-    
-    cur.execute("""
-        SELECT 
-            p.id_proyecto, 
-            p.nombre AS titulo,
-            p.descripcion,
-            p.fecha_creacion,
-            r.codigo AS mi_rol,
-            r.nombre AS nombre_rol
-        FROM proyectos p
-        JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
-        JOIN roles r ON r.id_rol = pm.id_rol
-        WHERE pm.id_usuario = %s
-        ORDER BY p.fecha_creacion DESC
-    """, (user_id,))
-    
+
+    if search:
+        # 🔍 Filtrado por título
+        cur.execute("""
+            SELECT 
+                p.id_proyecto, 
+                p.nombre AS titulo,
+                p.descripcion,
+                p.fecha_creacion,
+                r.codigo AS mi_rol,
+                r.nombre AS nombre_rol
+            FROM proyectos p
+            JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
+            JOIN roles r ON r.id_rol = pm.id_rol
+            WHERE pm.id_usuario = %s
+            AND LOWER(p.nombre) LIKE %s
+            ORDER BY p.fecha_creacion DESC
+        """, (user_id, f"%{search}%"))
+    else:
+        # 🔎 Sin filtro → trae todos como antes
+        cur.execute("""
+            SELECT 
+                p.id_proyecto, 
+                p.nombre AS titulo,
+                p.descripcion,
+                p.fecha_creacion,
+                r.codigo AS mi_rol,
+                r.nombre AS nombre_rol
+            FROM proyectos p
+            JOIN proyecto_miembros pm ON pm.id_proyecto = p.id_proyecto
+            JOIN roles r ON r.id_rol = pm.id_rol
+            WHERE pm.id_usuario = %s
+            ORDER BY p.fecha_creacion DESC
+        """, (user_id,))
+
     proyectos = cur.fetchall()
+
     cur.close()
     conn.close()
-    
+
     return jsonify({
         "total": len(proyectos),
         "proyectos": proyectos
     }), 200
-
 
 @project_bp.route('/proyectos/<int:id_proyecto>', methods=['GET'])
 @jwt_required()
@@ -252,6 +273,10 @@ def agregar_miembro(id_proyecto):
     finally:
         cur.close()
         conn.close()
+        
+        
+
+@project_bp.route('/tareas/<int>id>/horas')        
 
 
 @project_bp.route('/usuarios/buscar', methods=['GET'])
@@ -288,96 +313,3 @@ def buscar_usuarios():
     
     return jsonify(usuarios), 200
 
-@project_bp.route('/proyectos/<int:id_proyecto>/miembros/<int:id_usuario>', methods=['DELETE'])
-@jwt_required()
-@require_project_role(['LIDER', 'ADMIN'])
-def eliminar_miembro(id_proyecto, id_usuario):
-    """
-    Elimina un miembro del proyecto.
-    Solo LIDER o ADMIN del proyecto pueden hacerlo.
-    No se puede eliminar al creador del proyecto.
-    """
-    conn = get_connection()
-    cur = conn.cursor(dictionary=True)
-    
-    try:
-        # Verificar que no sea el creador del proyecto
-        cur.execute(
-            "SELECT creado_por FROM proyectos WHERE id_proyecto = %s",
-            (id_proyecto,)
-        )
-        proyecto = cur.fetchone()
-        
-        if not proyecto:
-            return _json_error("Proyecto no encontrado", 404)
-        
-        if proyecto['creado_por'] == id_usuario:
-            return _json_error("No puedes eliminar al creador del proyecto", 400)
-        
-        # Eliminar miembro
-        cur.execute(
-            """DELETE FROM proyecto_miembros 
-               WHERE id_proyecto = %s AND id_usuario = %s""",
-            (id_proyecto, id_usuario)
-        )
-        
-        if cur.rowcount == 0:
-            return _json_error("El usuario no es miembro del proyecto", 404)
-        
-        conn.commit()
-        return jsonify({"mensaje": "Miembro eliminado exitosamente"}), 200
-        
-    except Exception as e:
-        conn.rollback()
-        return _json_error(str(e), 500)
-    finally:
-        cur.close()
-        conn.close()
-
-
-
-@project_bp.route('/proyectos/<int:id_proyecto>', methods=['DELETE'])
-@jwt_required()
-def eliminar_proyecto(id_proyecto):
-    """
-    Elimina un proyecto completo.
-    Solo el creador del proyecto o un ADMIN global pueden eliminarlo.
-    Esto eliminará en cascada: tareas, miembros, etc.
-    """
-    user_id = int(get_jwt_identity())
-    conn = get_connection()
-    cur = conn.cursor(dictionary=True)
-    
-    try:
-        # Verificar que el proyecto existe
-        cur.execute(
-            "SELECT creado_por FROM proyectos WHERE id_proyecto = %s",
-            (id_proyecto,)
-        )
-        proyecto = cur.fetchone()
-        
-        if not proyecto:
-            return _json_error("Proyecto no encontrado", 404)
-        
-        # Verificar permisos: creador o ADMIN global
-        es_creador = proyecto['creado_por'] == user_id
-        es_admin = _user_is_global_admin(cur, user_id)
-        
-        if not (es_creador or es_admin):
-            return _json_error("Solo el creador o un ADMIN pueden eliminar este proyecto", 403)
-        
-        # Eliminar proyecto (CASCADE eliminará tareas y miembros automáticamente)
-        cur.execute("DELETE FROM proyectos WHERE id_proyecto = %s", (id_proyecto,))
-        conn.commit()
-        
-        return jsonify({
-            "mensaje": "Proyecto eliminado exitosamente",
-            "id_proyecto": id_proyecto
-        }), 200
-        
-    except Exception as e:
-        conn.rollback()
-        return _json_error(str(e), 500)
-    finally:
-        cur.close()
-        conn.close()
