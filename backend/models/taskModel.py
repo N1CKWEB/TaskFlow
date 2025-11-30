@@ -3,7 +3,7 @@ from backend.conection.conexion import get_connection
 
 # ================== FUNCIONES PARA TAREAS ==================
 
-def crear_tarea(nombre, descripcion, prioridad, tiempo_estimado, id_usuario, id_proyecto, estado='PENDIENTE'):
+def crear_tarea(nombre, descripcion, prioridad, tiempo_estimado,horas_estimadas, id_usuario, id_proyecto, estado='PENDIENTE'):
     """
     Inserta una nueva tarea en la base de datos, asociada a un usuario y proyecto.
     
@@ -23,10 +23,10 @@ def crear_tarea(nombre, descripcion, prioridad, tiempo_estimado, id_usuario, id_
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO tareas (nombre, descripcion, prioridad, tiempo_estimado, 
+            INSERT INTO tareas (nombre, descripcion, prioridad, tiempo_estimado, horas_estimadas,
                               id_usuario, id_proyecto, estado)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (nombre, descripcion, prioridad, tiempo_estimado, id_usuario, id_proyecto, estado))
+        """, (nombre, descripcion, prioridad, tiempo_estimado, horas_estimadas, id_usuario, id_proyecto, estado))
         conn.commit()
         return cursor.lastrowid
     finally:
@@ -187,8 +187,7 @@ def actualizar_tarea(id_tarea, **campos):
         return False
     
     # Campos permitidos para actualizar
-    campos_permitidos = {'nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 
-                        'estado', 'id_usuario'}
+    campos_permitidos = {'nombre', 'descripcion', 'prioridad', 'tiempo_estimado', 'horas_estimadas','estado', 'id_usuario'}
     campos_validos = {k: v for k, v in campos.items() if k in campos_permitidos}
     
     if not campos_validos:

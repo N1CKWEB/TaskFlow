@@ -118,13 +118,15 @@ def crear_tarea(project_id: int):
 
         # ✅ Convertir fecha_entrega a fecha_limite
         fecha_limite = data.get("fecha_limite") or data.get("fecha_entrega")
+        
+        horario_estimado=data.get("horas_estimadas")
 
         cur.execute(
             """
             INSERT INTO tareas
-                (id_proyecto, titulo, descripcion, prioridad, estado, fecha_inicio, fecha_entrega, creado_por, asignado_a)
+                (id_proyecto, titulo, descripcion, prioridad, estado, fecha_inicio, fecha_entrega,horas_estimadas, creado_por, asignado_a)
             VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 project_id,
@@ -134,6 +136,7 @@ def crear_tarea(project_id: int):
                 estado_bd,
                 data.get("fecha_inicio"),
                 fecha_limite,
+                horario_estimado,
                 uid,
                 asignado_a,
             ),
@@ -151,7 +154,8 @@ def crear_tarea(project_id: int):
             "prioridad": prioridad,
             "estado": estado_frontend,  # Devolver en formato frontend
             "fecha_limite": fecha_limite,
-            "horas_estimadas": data.get("horas_estimadas", 0),
+            "horas_estimadas": horario_estimado,
+            "horas_trabajadas": data.get("horas_trabajadas", 0),
             "condiciones_aceptacion": data.get("condiciones_aceptacion", "")
         }), 201
 
@@ -195,6 +199,7 @@ def listar_tareas_proyecto(project_id: int):
                 t.creado_por,
                 t.fecha_creacion,
                 t.fecha_actualizacion,
+                horas_estimadas,
                 u_asignado.nombre_completo as nombre_asignado,
                 u_creador.nombre_completo as nombre_creador
             FROM tareas t
@@ -246,7 +251,7 @@ def listar_tareas():
     try:
         base = f"""
         SELECT t.id_tarea, t.id_proyecto, t.titulo, t.descripcion, t.prioridad, t.estado,
-               t.fecha_inicio, t.fecha_entrega, t.asignado_a, t.creado_por, t.fecha_creacion, t.fecha_actualizacion
+               t.fecha_inicio, t.fecha_entrega, t.asignado_a, t.creado_por, t.fecha_creacion, t.fecha_actualizacion,t.horas_estimadas
         FROM tareas t
         {_task_visibility_filter_for_user()}
         """
