@@ -19,7 +19,10 @@ import {
   apiActualizarTarea, 
   apiEliminarTarea 
 } from '../api/api';
-
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 export function DashboardTeam() {
   
@@ -58,6 +61,16 @@ export function DashboardTeam() {
   const [horaInicio, setHoraInicio] = useState(null);
   const [horasTrabajadas, setHorasTrabajadas] = useState(0);
   const [horaInicioEquipo, setHoraInicioEquipo] = useState(null);
+
+ // Estados para el control de Modal UI 
+     const [open, setOpen] = React.useState(false);
+     const handleOpen = () => setOpen(true);
+     const handleClose = () => setOpen(false);
+ 
+     const [openError, setOpenError] = React.useState(false);
+     const handleOpenError = () => setOpenError(true);
+     const handleCloseError = () => setOpenError(false);
+   
 
   // 🔄 Cargar datos del usuario al montar el componente
   useEffect(() => {
@@ -216,7 +229,8 @@ const cargarTareas = async (id) => {
     }
 
     if (!nombre || !prioridad || !fechaEntrega) {
-      alert("⚠️ Por favor completa los campos obligatorios: Nombre, Prioridad y Fecha de Entrega");
+      
+      handleOpenError();
       return;
     }
 
@@ -258,7 +272,7 @@ const cargarTareas = async (id) => {
       };
 
       setTareas([...tareas, nuevaTareaObj]);
-      alert("✅ Tarea creada exitosamente");
+      handleOpen();
       handleCerrarForm();
 
     } catch (error) {
@@ -492,7 +506,7 @@ const cargarTareas = async (id) => {
 
 
   return (
-    <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
+<div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
       
 
       {/* === SIDEBAR DESLIZANTE === */}
@@ -787,6 +801,141 @@ const cargarTareas = async (id) => {
             </div>
           </div>
         )}
+              <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            
+           >
+       <Box 
+            sx={{
+              p: 4,
+              width: 360,
+              bgcolor: "white",
+              borderRadius: "20px",
+              boxShadow: "0px 20px 40px rgba(0,0,0,0.1)",
+              textAlign: "center",
+              justifyContent:'center',
+              margin:'0 auto 15px',
+              backdropFilter: "blur(6px)",
+              animation: "fadeIn 0.3s ease-out",
+              position:'relative',
+              top:200
+            }}
+      >
+        <div
+          style={{
+            width: 70,
+            height: 70,
+            margin: "0 auto 15px",
+            background: "#e7f5ff",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 35,
+            color: "#1e80ff",
+            fontWeight: "bold",
+          }}
+          >
+          ✓
+        </div>
+
+        <Typography variant="h6" sx={{ fontWeight: "600", mb: 1 }}>
+          Tarea creada
+        </Typography>
+
+        <Typography sx={{ mb: 3, fontSize: "15px", color: "#555" }}>
+          Todo salió bien. Ya podés continuar.
+        </Typography>
+
+        <button
+            
+            onClick={handleClose}
+            style={{
+              padding: "10px 0",
+              background: "#1e80ff",
+              color: "white",
+              width: "100%",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+            >
+          Aceptar
+        </button>
+      </Box>
+    </Modal>
+   {/* Modal para campos incompletos de crear tarea */}
+   <Modal
+            
+            open={openError}
+            onClose={handleCloseError}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            
+           >
+    <Box 
+            sx={{
+              p: 4,
+              width: 360,
+              bgcolor: "white",
+              borderRadius: "20px",
+              boxShadow: "0px 20px 40px rgba(0,0,0,0.1)",
+              textAlign: "center",
+              justifyContent:'center',
+              margin:'0 auto 15px',
+              backdropFilter: "blur(6px)",
+              animation: "fadeIn 0.3s ease-out",
+              position:'relative',
+              top:200
+            }}
+      >
+        <div
+          style={{
+            width: 70,
+            height: 70,
+            margin: "0 auto 15px",
+            background: "#e7f5ff",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 35,
+            color: "#1e80ff",
+            fontWeight: "bold",
+          }}
+          >
+          ⚠️
+        </div>
+
+        <Typography variant="h6" sx={{ fontWeight: "920", mb: 1,color:'red' }}>
+        Por favor completa los campos obligatorios
+       </Typography>
+        <Typography sx={{ mb: 3, fontSize: "15px", color: "#555" }}>
+        Nombre, Prioridad y Fecha de Entrega
+         </Typography>
+
+        <button
+            
+            onClick={handleCloseError}
+            style={{
+              padding: "10px 0",
+              background: "#1e80ff",
+              color: "white",
+              width: "100%",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+            >
+          Aceptar
+        </button>
+      </Box>
+    </Modal>
       </main>
     </div>
  )

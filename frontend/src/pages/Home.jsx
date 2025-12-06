@@ -13,7 +13,22 @@ import { LiaUserPlusSolid } from "react-icons/lia";
 import { TbUserCode } from "react-icons/tb";
 import { Link, useNavigate } from 'react-router-dom';
 import { apiCrearProyecto, apiListarProyectos,apiBuscarProyectos } from '../api/api';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 export function Home() {
   const navigate = useNavigate();
 
@@ -38,8 +53,16 @@ export function Home() {
   const [mostrarTodos, setMostrarTodos] = useState(false);
   const [mensajeLogout, setMensajeLogout] = useState("");
   const [cargando, setCargando] = useState(false);
+  const[mostrarAlertaProyectoCreado,setMostrarAlertaProyectoCreado] = useState(false);
 
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
+    const [openError, setOpenError] = React.useState(false);
+    const handleOpenError = () => setOpenError(true);
+    const handleCloseError = () => setOpenError(false);
+  
   // 🔄 Cargar datos del usuario al montar
   useEffect(() => {
     const usuarioData = {
@@ -154,13 +177,12 @@ export function Home() {
     setDesarrolladores(nuevos);
   };
 
-  // 🚀 Crear proyecto y enviarlo al backend
+  //  Crear proyecto y enviarlo al backend
   const handleCrearProyectoFinal = async () => {
     if (nuevoProyecto.trim() === "") {
-      alert("Por favor ingresa un nombre para el proyecto");
+      handleOpenError();
       return;
-    }
-
+    }    
     try {
       setCargando(true);
 
@@ -191,9 +213,13 @@ export function Home() {
       };
 
       setProyectos([...proyectos, nuevoProyectoObj]);
-      
-      alert("✅ Proyecto creado exitosamente");
+    
+      setMostrarAlertaProyectoCreado(true);
+    
       handleCerrarFormulario();
+      handleOpen();          
+      
+
 
     } catch (error) {
       console.error("Error al crear proyecto:", error);
@@ -263,6 +289,8 @@ export function Home() {
  
 
   return (
+
+
     <div className={`layout ${sidebarAbierta ? 'sidebar-open' : ''}`}>
       {/* === SIDEBAR === */}
       <aside className={`sidebar ${sidebarAbierta ? 'open' : ''}`}>
@@ -358,7 +386,7 @@ export function Home() {
                   <button onClick={handleCrearProyecto} className="new-btn">
                     + Nuevo Proyecto
                   </button>
-                  <button className="import-btn">Importar Proyecto</button>
+                  
                 </>
               ) : (
                 <div style={{
@@ -382,6 +410,8 @@ export function Home() {
 
         {/* ✅ Solo mostrar formulario si tiene permisos */}
         {mostrarFormulario && puedeCrearProyectos() && (
+          <div className='overlay'>
+
           <div className={`card-new-project ${animando}`}>
             <h2 className='title-new-project'>Título del Proyecto</h2>
             <input
@@ -402,7 +432,7 @@ export function Home() {
                 placeholder="Introduce el nombre del dueño del proyecto"
                 value={nombreDueno}
                 onChange={(e) => setNombreDueno(e.target.value)}
-              />
+                />
             </div>
 
             <div className="member-input">
@@ -413,7 +443,7 @@ export function Home() {
                 placeholder="Introduce el nombre del líder técnico"
                 value={nombreLider}
                 onChange={(e) => setNombreLider(e.target.value)}
-              />
+                />
             </div>
 
             {desarrolladores.map((dev, index) => (
@@ -425,42 +455,182 @@ export function Home() {
                   placeholder={`Desarrollador ${index + 1}`}
                   value={dev}
                   onChange={(e) => manejarCambio(index, e.target.value)}
-                />
+                  />
                 {desarrolladores.length > 1 && (
                   <button
-                    type="button"
-                    className="delete-dev-btn"
-                    onClick={() => eliminarDesarrollador(index)}
+                  type="button"
+                  className="delete-dev-btn"
+                  onClick={() => eliminarDesarrollador(index)}
                   >
                     <FaTimes />
                   </button>
                 )}
               </div>
             ))}
-
+            
             <button onClick={handleAgregarDesarrollador} className='button-user-add'>
               <LiaUserPlusSolid className='icon-users' />
               <span className='title-user-add'>Agregar otro desarrollador</span>
             </button>
+           
 
+          
             <div className="buttons-create-close">
-              <button 
-                onClick={handleCrearProyectoFinal} 
-                className='button-create-project'
-                disabled={cargando}
-              >
+              
+              <button onClick={handleCrearProyectoFinal}  className='button-create-project' disabled={cargando}>
+              
                 <span className='title-user-add'>
-                  {cargando ? "Creando..." : "Crear Proyecto"}
+                  {cargando ? "Creando..." : "Crear Proyecto"} 
                 </span>
+
               </button>
 
               <button onClick={handleCerrarFormulario} className='button-close-project'>
                 <span className='title-user-add'>Cerrar</span>
               </button>
+
+            </div>
             </div>
           </div>
         )}
+            <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            
+           >
+       <Box 
+            sx={{
+              p: 4,
+              width: 360,
+              bgcolor: "white",
+              borderRadius: "20px",
+              boxShadow: "0px 20px 40px rgba(0,0,0,0.1)",
+              textAlign: "center",
+              justifyContent:'center',
+              margin:'0 auto 15px',
+              backdropFilter: "blur(6px)",
+              animation: "fadeIn 0.3s ease-out",
+              position:'relative',
+              top:200
+            }}
+      >
+        <div
+          style={{
+            width: 70,
+            height: 70,
+            margin: "0 auto 15px",
+            background: "#e7f5ff",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 35,
+            color: "#1e80ff",
+            fontWeight: "bold",
+          }}
+          >
+          ✓
+        </div>
+
+        <Typography variant="h6" sx={{ fontWeight: "600", mb: 1 }}>
+          Proyecto creado
+        </Typography>
+
+        <Typography sx={{ mb: 3, fontSize: "15px", color: "#555" }}>
+          Todo salió bien. Ya podés continuar.
+        </Typography>
+
+        <button
+            
+            onClick={handleClose}
+            style={{
+              padding: "10px 0",
+              background: "#1e80ff",
+              color: "white",
+              width: "100%",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+            >
+          Aceptar
+        </button>
+      </Box>
+    </Modal>
+     {/* Modal para campos incompletos de crear proyecto */}
+    <Modal
+            
+            open={openError}
+            onClose={handleCloseError}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            
+           >
+       <Box 
+            sx={{
+              p: 4,
+              width: 360,
+              bgcolor: "white",
+              borderRadius: "20px",
+              boxShadow: "0px 20px 40px rgba(0,0,0,0.1)",
+              textAlign: "center",
+              justifyContent:'center',
+              margin:'0 auto 15px',
+              backdropFilter: "blur(6px)",
+              animation: "fadeIn 0.3s ease-out",
+              position:'relative',
+              top:200
+            }}
+      >
+        <div
+          style={{
+            width: 70,
+            height: 70,
+            margin: "0 auto 15px",
+            background: "#e7f5ff",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 35,
+            color: "#1e80ff",
+            fontWeight: "bold",
+          }}
+          >
+          ❌
+        </div>
+
+        <Typography variant="h6" sx={{ fontWeight: "920", mb: 1,color:'red' }}>
+        Campo requerido nombre del proyecto
+       </Typography>
+
+        <Typography sx={{ mb: 3, fontSize: "15px", color: "#555" }}>
+        Por favor ingresa un nombre para el proyecto para poder continuar
+         </Typography>
+
+        <button
+            
+            onClick={handleCloseError}
+            style={{
+              padding: "10px 0",
+              background: "#1e80ff",
+              color: "white",
+              width: "100%",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+            >
+          Aceptar
+        </button>
+      </Box>
+    </Modal>
       </main>
+              
     </div>
   );
 }

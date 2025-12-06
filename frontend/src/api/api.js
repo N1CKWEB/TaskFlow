@@ -12,6 +12,28 @@ export async function apiLogin(email, contraseña) {
   return r.json();
 }
 
+export async function apiRefresh() {
+  const refreshToken = localStorage.getItem("refresh_token");
+  if (!refreshToken) throw { error: "No hay refresh token guardado" };
+
+  const r = await fetch(`${API}/refresh`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${refreshToken}`
+    }
+  });
+
+  if (!r.ok) throw await r.json();
+
+  const data = await r.json();
+
+  // Guardar el nuevo access token
+  localStorage.setItem("token", data.access_token);
+
+  return data.access_token;
+}
+
+
 // ---- REGISTRO ----
 export async function apiRegister(datos) {
   const r = await fetch(`${API}/usuarios`, {
@@ -45,19 +67,35 @@ export async function apiCrearProyecto(datos) {
 }
 
 // ---- LISTAR MIS PROYECTOS ----
-export async function apiListarProyectos() {
-  const token = localStorage.getItem("token");
-  
-  const r = await fetch(`${API}/proyectos`, {
-    method: 'GET',
-    headers: { 
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  
+async function fetchWithAuth(url, options = {}) {
+  let token = localStorage.getItem("token");
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Authorization": `Bearer ${token}`
+  };
+
+  let r = await fetch(url, options);
+
+  // Si expiró el token → refrescamos
+  if (r.status === 401) {
+    const newToken = await apiRefresh();
+
+    // Reintentar la petición
+    options.headers["Authorization"] = `Bearer ${newToken}`;
+    r = await fetch(url, options);
+  }
+
   if (!r.ok) throw await r.json();
+  
   return r.json();
 }
+
+
+export async function apiListarProyectos() {
+  return fetchWithAuth(`${API}/proyectos`, { method: "GET" });
+}
+
 
 export async function apiBuscarProyectos(search) {
   const token = localStorage.getItem("token");
@@ -88,6 +126,7 @@ export async function apiObtenerProyecto(idProyecto) {
   if (!r.ok) throw await r.json();
   return r.json();
 }
+
 
 // ---- AGREGAR MIEMBRO A PROYECTO ----
 export async function apiAgregarMiembro(idProyecto, datos) {
@@ -195,3 +234,5 @@ export async function apiObtenerMiembrosProyecto(idProyecto) {
     .then(res => res.data)
     .catch(err => { throw err });
 }
+
+

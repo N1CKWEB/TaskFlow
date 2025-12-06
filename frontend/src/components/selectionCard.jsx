@@ -19,13 +19,18 @@ import { useState,useEffect } from 'react';
 import { MdVisibility, MdVisibilityOff, MdCameraAlt } from 'react-icons/md';
 
 export function SelectionCard() {
+
+  // 🔐 Estados del usuario
+    const [usuario, setUsuario] = useState({
+      id: null,
+      nombre: "",
+      rol_id: null,
+      rol_codigo: ""
+    });
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     profileImage: userImg,
-    name: '',
-    email: '',
-    password: '',
-    navColor: '#1B3A5C'
   });
 
   // Mostrar/Ocultar password
@@ -86,7 +91,7 @@ export function SelectionCard() {
       {/* Inputs */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 3 }}>
         <FormControl sx={{ m: 1, width: '30ch' }} variant="filled">
-          <InputLabel htmlFor="name-input">Nombre</InputLabel>
+          <InputLabel htmlFor="name-input" >Nombre</InputLabel>
           <FilledInput
             id="name-input"
             name="name"

@@ -1,10 +1,18 @@
 # backend/controller/projectController.py
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity,create_access_token
 from backend.conection.conexion import get_connection
 from backend.controller.auth_middleware import require_project_role
 
 project_bp = Blueprint('project_bp', __name__)
+
+
+@project_bp.route('/refresh',methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identify=get_jwt_identity()
+    new_access=create_access_token(identity=identify,fresh=False)
+    return jsonify(create_access_token=new_access)
 
 
 @project_bp.route('/proyectos', methods=['POST'])
