@@ -4,7 +4,7 @@ TaskFlow es una aplicación moderna estilo **Trello** que permite crear, visuali
 
 ---
 
-## 🎨 FRONTEND – Aplicación Visual de Tareas (HTML + CSS + JS)
+## 🎨 FRONTEND – Aplicación Visual de Tareas (REACT JS )
 
 ### 🔍 Funcionalidades principales
 
